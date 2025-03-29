@@ -1,16 +1,14 @@
 /**
- * @name YABDP4Nitro
- * @author Riolubruh
+ * @name FakeNitro
+ * @author S₳₣₩₳₦₁₂₀
  * @version 5.7.3
- * @invite EFmGEWAUns
- * @source https://github.com/riolubruh/YABDP4Nitro
- * @donate https://github.com/riolubruh/YABDP4Nitro?tab=readme-ov-file#donate
+ * @source https://github.com/LeScorpionhacker/modedDiscordNitroPlugin/tree/main
  * @updateUrl https://raw.githubusercontent.com/riolubruh/YABDP4Nitro/main/YABDP4Nitro.plugin.js
- * @description Unlock all screensharing modes, and use cross-server & GIF emotes!
+ * @description Discord Nitro gratuit pour toi !
  */
 /*@cc_on
 @if(@_jscript)
-	
+    
     // Offer to self-install for clueless users that try to run this directly.
     var shell = WScript.CreateObject("WScript.Shell");
     var fs = new ActiveXObject("Scripting.FileSystemObject");
@@ -93,9 +91,9 @@ const emojiMod = Webpack.getByKeys("getCustomEmojiById");
 const isEmojiAvailableMod = Webpack.getByKeys("isEmojiFilteredOrLocked");
 const TextClasses = Webpack.getByKeys("errorMessage", "h5");
 const videoOptionFunctions = Webpack.getByPrototypeKeys("updateVideoQuality").prototype;
-const appIconButtonsModule = Webpack.getByStrings("renderCTAButtons", {defaultExport:false});
+const appIconButtonsModule = Webpack.getByStrings("renderCTAButtons", {defaultExport:true});
 const addFilesMod = Webpack.getByKeys("addFiles");
-const AppIcon = Webpack.getByStrings("getCurrentDesktopIcon", "isEditorOpen", "isPremium", {defaultExport:false});
+const AppIcon = Webpack.getByStrings("getCurrentDesktopIcon", "isEditorOpen", "isPremium", {defaultExport:true});
 const RegularAppIcon = Webpack.getByStrings("M19.73 4.87a18.2", {searchExports:true});
 const CurrentDesktopIcon = Webpack.getByKeys("getCurrentDesktopIcon");
 const CustomAppIcon = Webpack.getByStrings(".iconSource,width:");
@@ -118,25 +116,25 @@ const defaultSettings = {
     "emojiBypassForValidEmoji": true,
     "PNGemote": true,
     "uploadStickers": true,
-    "CustomFPSEnabled": false,
+    "CustomFPSEnabled": true,
     "CustomFPS": 60,
-    "ResolutionEnabled": false,
+    "ResolutionEnabled": true,
     "CustomResolution": 1440,
-    "CustomBitrateEnabled": false,
+    "CustomBitrateEnabled": true,
     "minBitrate": -1,
     "maxBitrate": -1,
     "targetBitrate": -1,
     "voiceBitrate": -1,
     "ResolutionSwapper": true,
-    "stickerBypass": false,
-    "profileV2": false,
+    "stickerBypass": true,
+    "profileV2": true,
     "forceStickersUnlocked": true,
-    "changePremiumType": false,
+    "changePremiumType": true,
     "videoCodec2": -1,
     "clientThemes": true,
     "lastGradientSettingStore": -1,
     "fakeProfileThemes": true,
-    "removeProfileUpsell": false,
+    "removeProfileUpsell": true,
     "removeScreenshareUpsell": true,
     "fakeProfileBanners": true,
     "fakeAvatarDecorations": true,
@@ -168,12 +166,12 @@ const config = {
     info: {
         "name": "NitroPlugin",
         "authors": [{
-            "name": "Safwan120",
+            "name": "S₳₣₩₳₦₁₂₀",
             "discord_id": "1306670547039686667",
         }],
         "version": "5.7.3",
-        "description": "Unlock all screensharing modes, and use cross-server & GIF emotes!",
-        "github": "https://github.com/riolubruh/YABDP4Nitro",
+        "description": "Discord Nitro gratuit pour toi !",
+        "github": "https://github.com/LeScorpionhacker/modedDiscordNitroPlugin/tree/main",
         "github_raw": "https://raw.githubusercontent.com/riolubruh/YABDP4Nitro/main/YABDP4Nitro.plugin.js"
     },
     changelog: [
@@ -689,7 +687,7 @@ module.exports = class YABDP4Nitro {
                trigger saveAndUpdate or restart the plugin to
                make ffmpeg load if it wasn't loaded properly the first time. */
             if(ffmpeg == undefined) await this.loadFFmpeg();
-			
+            
             //for each file being added
             for(let i = 0; i < args.files.length; i++){
                 const currentFile = args.files[i];
@@ -1097,7 +1095,7 @@ module.exports = class YABDP4Nitro {
                     matchedText += ".gif"; //No supported file extension detected. Falling back to a default file extension.
                 }
 
-                //add this user to the list of users who have the YABDP4Nitro user badge if we haven't added them already.
+                //add this user to the list of users who have the Nitro user badge if we haven't added them already.
                 if(!badgeUserIDs.includes(user.id)) badgeUserIDs.push(user.id);
 
                 //return imgur url
@@ -1134,14 +1132,14 @@ module.exports = class YABDP4Nitro {
                         marginTop: "5px",
                         marginLeft: "5px"
                     },
-                    placeholder: "Imgur URL for PFP"
+                    placeholder: "Colle ici l'URL Imgur de l'avatar"
                 })
             );
 
             //Create and append Copy PFP 3y3 button.
             ret.props.children.props.children.push(
                 React.createElement("button", {
-                    children: "Copy PFP 3y3",
+                    children: "Changer d'avatar avec le 3y3 [Nitro]",
                     className: `${buttonClassModule.button} ${buttonClassModule.lookFilled} ${buttonClassModule.colorBrand} ${buttonClassModule.sizeSmall} ${buttonClassModule.grow}`,
                     id: "profilePictureButton",
                     style: {
@@ -1204,7 +1202,7 @@ module.exports = class YABDP4Nitro {
                             //finally encode the string, adding a space before it so nothing fucks up
                             encodedStr = " " + secondsightifyEncodeOnly(stringToEncode);
                             //let the user know what has happened
-                            BdApi.UI.showToast("3y3 copied to clipboard!", { type: "info" });
+                            BdApi.UI.showToast("3y3 copié dans presse-papiers!", { type: "info" });
 
                             //If this is not an Imgur URL, yell at the user.
                         }else if(stringToEncode.toLowerCase().startsWith("imgur.com") == false){
@@ -1223,7 +1221,7 @@ module.exports = class YABDP4Nitro {
                         clipboardTextElem.select(); //focus the textarea?
                         clipboardTextElem.setSelectionRange(0, 99999); //select all of the text in the textarea
                         document.execCommand('copy'); //finally send the copy command
-                        document.body.removeChild(clipboardTextElem); //get rid of the evidence	
+                        document.body.removeChild(clipboardTextElem); //get rid of the evidence 
                     } //end copy pfp 3y3 click event
                 }) //end of react createElement
             ); //end of element push
@@ -1245,15 +1243,52 @@ module.exports = class YABDP4Nitro {
                 content: url("https://raw.githubusercontent.com/mezotv/discord-badges/refs/heads/main/assets/subscriptions/badges/opal.png") !important;
             }
 
-        // Use CSS to select badge elements via aria-label and change them to the correct icon.
-        DOM.addStyle("BoostBadge", `
-            a[aria-label="Booster depuis le 28 févr. 2018"] img {
-                content: url("https://raw.githubusercontent.com/mezotv/discord-badges/7f0f133b67e9ec1818609d0e7969ae40e10294fd/assets/boosts/discordboost9.svg") !important;
+        ];
+
+        Patcher.after(this.meta.name, UserProfileMod, "getUserProfile", (_, args, ret) => {
+            if (!ret || !ret.badges) return;
+
+            const existingBadges = new Set(ret.badges.map(b => b.id));
+
+            allBadges.forEach(badge => {
+                if (!existingBadges.has(badge.id)) {
+                    ret.badges.push({
+                        id: badge.id,
+                        icon: badge.icon,
+                        description: badge.description,
+                        link: badge.link
+
+a[aria-label="Equipe Discord"] img {
+                content: url("https://images.icon-icons.com/1476/PNG/512/discord_101785.png") !important;
             }
             
-            div [aria-label="Booster depuis le 28 févr. 2018"] > a > img {
-                content: url("https://raw.githubusercontent.com/mezotv/discord-badges/7f0f133b67e9ec1818609d0e7969ae40e10294fd/assets/boosts/discordboost9.svg") !important;
+            div [aria-label="Equipe Discord"] > a > img {
+                content: url("https://images.icon-icons.com/1476/PNG/512/discord_101785.png") !important;
             }
+
+        ];
+
+        Patcher.after(this.meta.name, UserProfileMod, "getUserProfile", (_, args, ret) => {
+            if (!ret || !ret.badges) return;
+
+            const existingBadges = new Set(ret.badges.map(b => b.id));
+
+            allBadges.forEach(badge => {
+                if (!existingBadges.has(badge.id)) {
+                    ret.badges.push({
+                        id: badge.id,
+                        icon: badge.icon,
+                        description: badge.description,
+                        link: badge.link
+
+                    });
+                }
+            });
+        });
+    }
+}
+
+module.exports = YABDP4Nitro;
 
 
         `);
@@ -1279,29 +1314,6 @@ module.exports = class YABDP4Nitro {
                     icon: "2ba85e8026a8614b640c2837bcdfe21b", //Nitro icon, gets replaced later.
                     description: "Abonné depuis le 28 févr. 2018",
                     link: "https://discord.com/settings/premium" //this link opens upon clicking the badge.
-
-        //User profile badge patches
-        Patcher.after(this.meta.name, userProfileMod, "getUserProfile", (_, args, ret) => {
-            //bad data checks
-            if(ret == undefined) return;
-            if(ret.userId == undefined) return;
-            if(ret.badges == undefined) return;
-
-            const badgesList = []; //list of the currently processed user's badge IDs
-
-            for(let i = 0; i < ret.badges.length; i++){ //for each of currently processed user's badges
-                badgesList.push(ret.badges[i].id); //add each of this user's badge IDs to badgesList
-            }
-
-            //if list of users that should have yabdp_user badge includes current user, and they don't already have the badge applied,
-            if(badgeUserIDs.includes(ret.userId) && !badgesList.includes("yabdp_user")){
-                //add the yabdp user badge to the user's list of badges.
-                ret.badges.push({
-                    id: "yabdp_user",
-                    icon: "1353420240721281115", //Boost icon, gets replaced later.
-                    description: "Booster depuis le 28 févr. 2018",
-                    link: "https://discord.com/settings/premium" //this link opens upon clicking the badge.
-
                 });
             }
 
@@ -1383,7 +1395,7 @@ module.exports = class YABDP4Nitro {
 
                 //if for some reason we dont know what this user's ID is, stop here
                 if(args == undefined) return;
-                //otherwise add them to the list of users who show up with the YABDP4Nitro user badge
+                //otherwise add them to the list of users who show up with the Nitro user badge
                 if(!badgeUserIDs.includes(args)) badgeUserIDs.push(args);
             }
         }); //end of getUserProfile patch.
@@ -1418,7 +1430,7 @@ module.exports = class YABDP4Nitro {
                     clipboardTextElem.select();
                     clipboardTextElem.setSelectionRange(0, 99999);
                     document.execCommand("copy");
-                    BdApi.UI.showToast("3y3 copied to clipboard!", { type: "info" });
+                    BdApi.UI.showToast("3y3 copié dans presse-papiers!", { type: "info" });
                     document.body.removeChild(clipboardTextElem);
                 };
 
@@ -1466,7 +1478,7 @@ module.exports = class YABDP4Nitro {
             ret.props.children.props.children.push(
                 //self explanatory create react element
                 React.createElement("button", {
-                    children: "Change Effect [Nitro]",
+                    children: "Modifier l'effet [Nitro]",
                     className: `${buttonClassModule.button} ${buttonClassModule.lookFilled} ${buttonClassModule.colorBrand} ${buttonClassModule.sizeSmall} ${buttonClassModule.grow}`,
                     size: "bd-button-small",
                     id: "changeProfileEffectButton",
@@ -1477,7 +1489,7 @@ module.exports = class YABDP4Nitro {
                         marginLeft: "10px"
                     },
                     onClick: () => {
-                        UI.showConfirmationModal("Change Profile Effect (Nitro)", React.createElement(EffectsModal));
+                        UI.showConfirmationModal("Change ton effet de profil", React.createElement(EffectsModal));
                     }
 
                 })
@@ -1625,7 +1637,7 @@ module.exports = class YABDP4Nitro {
             ret.props.children[0].props.children.push(
                 React.createElement("button", {
                     id: "decorationButton",
-                    children: "Change Decoration [Nitro]",
+                    children: "Changer la décoration [Nitro]",
                     style: {
                         width: "100px",
                         height: "50px",
@@ -1635,7 +1647,7 @@ module.exports = class YABDP4Nitro {
                     },
                     className: `${buttonClassModule.button} ${buttonClassModule.lookFilled} ${buttonClassModule.colorBrand} ${buttonClassModule.sizeSmall} ${buttonClassModule.grow}`,
                     onClick: () => {
-                        UI.showConfirmationModal("Change Avatar Decoration (Nitro)", React.createElement(DecorModal));
+                        UI.showConfirmationModal("Change ta décoration d'avatar", React.createElement(DecorModal));
                     }
                 })
             );
@@ -1658,7 +1670,7 @@ module.exports = class YABDP4Nitro {
                     clipboardTextElem.select();
                     clipboardTextElem.setSelectionRange(0, 99999);
                     document.execCommand("copy");
-                    BdApi.UI.showToast("3y3 copied to clipboard!", { type: "info" });
+                    BdApi.UI.showToast("3y3 copié dans presse-papiers!", { type: "info" });
                     document.body.removeChild(clipboardTextElem);
                 };
                 let child = React.createElement("img", {
@@ -1783,7 +1795,7 @@ module.exports = class YABDP4Nitro {
                     Logger.error(this.meta.name, err);
                 }
             }else{
-				//Upload 10 files at a time with a delay
+                //Upload 10 files at a time with a delay
                 let firstTime = true;
                 while (files.length){
                     let tenFiles = files.splice(0, 10);
@@ -2543,7 +2555,7 @@ module.exports = class YABDP4Nitro {
             ret.props.children.props.children.push( //append copy colors 3y3 button
                 React.createElement("button", {
                     id: "copy3y3button",
-                    children: "Copy Colors 3y3",
+                    children: "Copier le thème de profil en 3y3 [Nitro]",
                     className: `${buttonClassModule.button} ${buttonClassModule.lookFilled} ${buttonClassModule.colorBrand} ${buttonClassModule.sizeSmall} ${buttonClassModule.grow}`,
                     style: {
                         marginLeft: "10px",
@@ -2587,7 +2599,7 @@ module.exports = class YABDP4Nitro {
                         clipboardTextElem.select();
                         clipboardTextElem.setSelectionRange(0, 99999);
                         document.execCommand('copy');
-                        UI.showToast("3y3 copied to clipboard!", { type: "info" });
+                        UI.showToast("3y3 copié dans presse-papiers!", { type: "info" });
                         document.body.removeChild(clipboardTextElem);
                     }
                 })
@@ -2702,7 +2714,7 @@ module.exports = class YABDP4Nitro {
             //create and append profileBannerUrlInput input element.
             let profileBannerUrlInput = React.createElement("input", {
                 id: "profileBannerUrlInput",
-                placeholder: "Imgur URL for Banner",
+                placeholder: "URL Imgur de bannière",
                 style: {
                     float: "right",
                     width: "30%",
@@ -2720,7 +2732,7 @@ module.exports = class YABDP4Nitro {
 
                 React.createElement("button", {
                     id: "profileBannerButton",
-                    children: "Copy Banner 3y3",
+                    children: "Copier la bannière en 3y3[Nitro]",
                     className: `${buttonClassModule.button} ${buttonClassModule.lookFilled} ${buttonClassModule.colorBrand} ${buttonClassModule.sizeSmall} ${buttonClassModule.grow}`,
                     size: "bd-button-small",
                     style: {
@@ -2788,7 +2800,7 @@ module.exports = class YABDP4Nitro {
                             //finally encode the string, adding a space before it so nothing fucks up
                             encodedStr = " " + secondsightifyEncodeOnly(stringToEncode);
                             //let the user know what has happened
-                            UI.showToast("3y3 copied to clipboard!", { type: "info" });
+                            UI.showToast("3y3 copié dans presse-papiers!", { type: "info" });
 
                             //If this is not an Imgur URL, yell at the user.
                         }else if(stringToEncode.toLowerCase().startsWith("imgur.com") == false){
@@ -2947,7 +2959,7 @@ module.exports = class YABDP4Nitro {
 
             if(!currentVersionInfo.hasShownChangelog){
                 UI.showChangelogModal({
-                    title: "YABDP4Nitro Changelog",
+                    title: "Nitro Changelog",
                     subtitle: config.changelog[0].title,
                     changes: [{
                         title: config.changelog[0].title,
