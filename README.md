@@ -16,3 +16,14 @@ Enregistrez les modification; et voilà !!!
 -Pour la qualité de streaming Nitro, lançez un appel, cliquez sue le bouton de partage d'écran et voilà!!!
 
 -Pour le badge, vous l'obtiendrais dès que vous aurais injecté mon plugin dans "C:\Users\Safwa\AppData\Roaming\BetterDiscord\plugins"
+
+-Pour les emojis de serveurs, vous pouvez les utilliser partout (mais les super réactions ne marchent pas encore)
+
+-Pour les thèmes Nitro d'application, rendez-vous dans la section "Apparance" des paramètres utillisateurs de Discord.
+
+
+⚠ ATTENTION⚠ 
+Seuls les utillisateurs de mon plugin pourront voir vos modification. Les utillisateurs qui ne l'utillisent pas verront vorte profil normal (et sans le badge d'abonné)
+Ce plugin ne marche je crois que sur PC (mais à voir)
+ALORS HESITE PAS A LE PARTAGER SUR TON SERVEUR ET A TES AMMIS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Merci !
