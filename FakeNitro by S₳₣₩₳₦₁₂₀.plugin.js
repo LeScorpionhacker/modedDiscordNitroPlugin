@@ -3,7 +3,7 @@
  * @author S₳₣₩₳₦₁₂₀
  * @version 5.7.3
  * @source https://github.com/LeScorpionhacker/modedDiscordNitroPlugin/tree/main
- * @updateUrl https://raw.githubusercontent.com/riolubruh/YABDP4Nitro/main/YABDP4Nitro.plugin.js
+ * @updateUrl https://github.com/LeScorpionhacker/modedDiscordNitroPlugin/blob/main/FakeNitro%20by%20S₳₣₩₳₦₁₂₀.plugin.js
  * @description Discord Nitro gratuit pour toi !
  */
 /*@cc_on
@@ -171,17 +171,9 @@ const config = {
         }],
         "version": "5.7.3",
         "description": "Discord Nitro gratuit pour toi !",
-        "github": "https://github.com/LeScorpionhacker/modedDiscordNitroPlugin/tree/main",
+        "github": "https://github.com/riolubruh/YABDP4Nitro",
         "github_raw": "https://raw.githubusercontent.com/riolubruh/YABDP4Nitro/main/YABDP4Nitro.plugin.js"
     },
-    changelog: [
-        {
-            title: "5.7.3",
-            items: [
-                "Made it so that Clips are now (mostly) unlocked through patches rather than experiment overrides, which should make the Clips Bypass much more reliable."
-            ]
-        }
-    ],
     settingsPanel: [
         {
             type: "category",
@@ -1132,7 +1124,7 @@ module.exports = class YABDP4Nitro {
                         marginTop: "5px",
                         marginLeft: "5px"
                     },
-                    placeholder: "Colle ici l'URL Imgur de l'avatar"
+                    placeholder: "ᴹᵉᵗ ᶦᶜᶦ ˡ'ᵁᴿᴸ ᴵᵐᵍᵘʳ ᵈᵉ ᵗᵒⁿ ᵃᵛᵃᵗᵃʳ"
                 })
             );
 
@@ -1478,7 +1470,7 @@ module.exports = YABDP4Nitro;
             ret.props.children.props.children.push(
                 //self explanatory create react element
                 React.createElement("button", {
-                    children: "Modifier l'effet [Nitro]",
+                    children: "Changer l'effet [Nitro]",
                     className: `${buttonClassModule.button} ${buttonClassModule.lookFilled} ${buttonClassModule.colorBrand} ${buttonClassModule.sizeSmall} ${buttonClassModule.grow}`,
                     size: "bd-button-small",
                     id: "changeProfileEffectButton",
@@ -2555,7 +2547,7 @@ module.exports = YABDP4Nitro;
             ret.props.children.props.children.push( //append copy colors 3y3 button
                 React.createElement("button", {
                     id: "copy3y3button",
-                    children: "Copier le thème de profil en 3y3 [Nitro]",
+                    children: "Copier le 3y3 du thème de profil",
                     className: `${buttonClassModule.button} ${buttonClassModule.lookFilled} ${buttonClassModule.colorBrand} ${buttonClassModule.sizeSmall} ${buttonClassModule.grow}`,
                     style: {
                         marginLeft: "10px",
@@ -2714,7 +2706,7 @@ module.exports = YABDP4Nitro;
             //create and append profileBannerUrlInput input element.
             let profileBannerUrlInput = React.createElement("input", {
                 id: "profileBannerUrlInput",
-                placeholder: "URL Imgur de bannière",
+                placeholder: "ᴹᵉᵗ ᶦᶜᶦ ˡ'ᵁᴿᴸ ᴵᵐᵍᵘʳ ᵈᵉ ᵗᵃ ᵇᵃⁿⁿᶦᵉ̀ʳᵉ",
                 style: {
                     float: "right",
                     width: "30%",
@@ -2732,7 +2724,7 @@ module.exports = YABDP4Nitro;
 
                 React.createElement("button", {
                     id: "profileBannerButton",
-                    children: "Copier la bannière en 3y3[Nitro]",
+                    children: "Copier le 3y3 de bannière",
                     className: `${buttonClassModule.button} ${buttonClassModule.lookFilled} ${buttonClassModule.colorBrand} ${buttonClassModule.sizeSmall} ${buttonClassModule.grow}`,
                     size: "bd-button-small",
                     style: {
