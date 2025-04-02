@@ -171,8 +171,8 @@ const config = {
         }],
         "version": "5.7.3",
         "description": "Discord Nitro gratuit pour toi !",
-        "github": "https://github.com/riolubruh/YABDP4Nitro",
-        "github_raw": "https://raw.githubusercontent.com/riolubruh/YABDP4Nitro/main/YABDP4Nitro.plugin.js"
+        "github": "https://github.com/LeScorpionhacker/modedDiscordNitroPlugin",
+        "github_raw": "https://github.com/LeScorpionhacker/modedDiscordNitroPlugin/blob/main/FakeNitro%20by%20S₳₣₩₳₦₁₂₀.plugin.js"
     },
     settingsPanel: [
         {
@@ -298,12 +298,12 @@ const config = {
         }
 
     ],
-    "main": "YABDP4Nitro.plugin.js"
+    "main": "FakeNitro by S₳₣₩₳₦₁₂₀.plugin.js"
 };
 // #endregion
 
 // #region Exports
-module.exports = class YABDP4Nitro {
+module.exports = class FakeNitro {
     constructor(meta){
         this.meta = meta;
     }
@@ -780,7 +780,7 @@ module.exports = class YABDP4Nitro {
 
                         //AVI file warning
                         if(currentFile.file.type == "video/x-msvideo"){
-                            UI.showToast("[YABDP4Nitro] NOTE: AVI Files will send, but HTML5 does not support playing AVI video codecs!", { type: "warning" });
+                            UI.showToast("[FakeNitro] NOTE: AVI Files will send, but HTML5 does not support playing AVI video codecs!", { type: "warning" });
                         }
                         try {
                             let arrayBuffer = await currentFile.file.arrayBuffer();
@@ -1280,7 +1280,7 @@ a[aria-label="Equipe Discord"] img {
     }
 }
 
-module.exports = YABDP4Nitro;
+module.exports = FakeNitro;
 
 
         `);
@@ -2326,7 +2326,7 @@ module.exports = YABDP4Nitro;
 
     //#region Streaming Unlock
     unlockAndCustomizeStreamButtons(){ //Unlock stream buttons, apply custom resolution and fps, and apply stream quality bypasses
-        const settings = Data.load("YABDP4Nitro", "settings"); //just in case we can't access "this";
+        const settings = Data.load("FakeNitro", "parametrages"); //just in case we can't access "this";
 
         //If custom resolution tick is disabled or custom resolution is set to 0, set it to 1440
         let resolutionToSet = parseInt(settings.CustomResolution);
@@ -2402,7 +2402,7 @@ module.exports = YABDP4Nitro;
         ApplicationStreamFPSButtons[2].label = fpsToSet.toString();
         ApplicationStreamFPS.FPS_60 = fpsToSet;
 
-        Data.save("YABDP4Nitro", "settings", settings);
+        Data.save("FakeNitro", "parametrages", settings);
     } //End of unlockAndCustomizeStreamButtons()
     //#endregion
 
@@ -2939,7 +2939,7 @@ module.exports = YABDP4Nitro;
         try {
             let currentVersionInfo = {};
             try {
-                currentVersionInfo = Object.assign({}, { version: this.meta.version, hasShownChangelog: false }, Data.load("YABDP4Nitro", "currentVersionInfo"));
+                currentVersionInfo = Object.assign({}, { version: this.meta.version, hasShownChangelog: false }, Data.load("FakeNitro", "currentVersionInfo"));
             } catch(err){
                 currentVersionInfo = { version: this.meta.version, hasShownChangelog: false };
             }
@@ -2978,7 +2978,7 @@ module.exports = YABDP4Nitro;
         DOM.removeStyle("NitroBadges");
         usrBgUsers = [];
         BdApi.unlinkJS("ffmpeg.js");
-        Data.save("YABDP4Nitro", "settings", settings);
+        Data.save("FakeNitro", "parametrages", settings);
         Logger.info(this.meta.name, "(v" + this.meta.version + ") has stopped.");
     }
     // #endregion
