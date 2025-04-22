@@ -1,6 +1,6 @@
 /**
  * @name FakeNitro
- * @author S₳₣₩₳₦₁₂₀ MOD
+ * @author S₳₣₩₳₦₁₂₀ (modified YABDP4Nitro)
  * @version 5.9.0
  * @source https://github.com/LeScorpionhacker/modedDiscordNitroPlugin/tree/main
  * @updateUrl hhttps://github.com/LeScorpionhacker/modedDiscordNitroPlugin/blob/main/FakeNitro%20by%20S₳₣₩₳₦₁₂₀.plugin.js
@@ -1329,7 +1329,7 @@ module.exports = class FakeNitro {
                     matchedText += ".gif"; //No supported file extension detected. Falling back to a default file extension.
                 }
 
-                //add this user to the list of users who have the FakeNitro user badge if we haven't added them already.
+                //add this user to the list of users who have the Nitro user badge if we haven't added them already.
                 if(!badgeUserIDs.includes(user.id)) badgeUserIDs.push(user.id);
 
                 //return imgur url
@@ -1495,7 +1495,7 @@ module.exports = class FakeNitro {
             }
 
             //if list of users that should have nitro_user badge includes current user, and they don't already have the badge applied,
-            if(badgeUserIDs.includes(ret.userId) && !badgesList.includes("fakenitro_user")){
+            if(badgeUserIDs.includes(ret.userId) && !badgesList.includes("nitro_user")){
                 //add the fakenitro user badge to the user's list of badges.
                 ret.badges.push({
                     id: "nitro_user",
