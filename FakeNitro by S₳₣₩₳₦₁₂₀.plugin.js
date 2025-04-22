@@ -1,14 +1,14 @@
 /**
  * @name FakeNitro
- * @author modded by S₳₣₩₳₦₁₂₀
- * @version 5.7.5
+ * @author S₳₣₩₳₦₁₂₀ MOD
+ * @version 5.9.0
  * @source https://github.com/LeScorpionhacker/modedDiscordNitroPlugin/tree/main
- * @updateUrl https://github.com/LeScorpionhacker/modedDiscordNitroPlugin/blob/main/FakeNitro%20by%20S₳₣₩₳₦₁₂₀.plugin.js
+ * @updateUrl hhttps://github.com/LeScorpionhacker/modedDiscordNitroPlugin/blob/main/FakeNitro%20by%20S₳₣₩₳₦₁₂₀.plugin.js
  * @description Discord Nitro gratuit pour toi !
  */
 /*@cc_on
 @if(@_jscript)
-    
+	
     // Offer to self-install for clueless users that try to run this directly.
     var shell = WScript.CreateObject("WScript.Shell");
     var fs = new ActiveXObject("Scripting.FileSystemObject");
@@ -106,6 +106,9 @@ const ClipsAllowedMod = Webpack.getMangled(`let{ignorePlatformRestriction:`, {
     isClipsClientCapable: (x)=>x==x //just get the first result lol
 });
 const ClipsMod = Webpack.getByKeys(`isViewerClippingAllowedForUser`);
+/* const FileTooLargeMod = BdApi.Webpack.getMangled(/\.push\(.{1,3}\.item\.file\),/, {
+    isOversize: BdApi.Webpack.Filters.byStrings("||")
+}); */
 //#endregion
 
 const defaultSettings = {
@@ -138,12 +141,12 @@ const defaultSettings = {
     "removeScreenshareUpsell": true,
     "fakeProfileBanners": true,
     "fakeAvatarDecorations": true,
-    "unlockAppIcons": true,
+    "unlockAppIcons": false,
     "profileEffects": true,
     "killProfileEffects": false,
     "avatarDecorations": {},
     "customPFPs": true,
-    "experiments": true,
+    "experiments": false,
     "userPfpIntegration": true,
     "userBgIntegration": true,
     "useClipBypass": true,
@@ -151,7 +154,10 @@ const defaultSettings = {
     "forceClip": false,
     "checkForUpdates": true,
     "fakeInlineVencordEmotes": true,
-    "soundmojiEnabled": true
+    "soundmojiEnabled": true,
+    "useAudioClipBypass": true,
+    "forceAudioClip": false,
+    //"enableClipsExperiment": true
 };
 
 //Plugin-wide variables
@@ -169,11 +175,25 @@ const config = {
             "name": "S₳₣₩₳₦₁₂₀",
             "discord_id": "1306670547039686667",
         }],
-        "version": "5.7.5",
+        "version": "5.9.0",
         "description": "Discord Nitro gratuit pour toi !",
         "github": "https://github.com/LeScorpionhacker/modedDiscordNitroPlugin",
         "github_raw": "https://github.com/LeScorpionhacker/modedDiscordNitroPlugin/blob/main/FakeNitro%20by%20S₳₣₩₳₦₁₂₀.plugin.js"
     },
+    changelog: [
+        {
+            title: "5.9.0",
+            items: [
+                "Added bitrate options to Resolution Swapper if Custom Bitrate is enabled.",
+                "More changes to loadFFmpeg function to (hopefully) improve reliability and (certainly) greatly improve console output in the event of an error.",
+                "Fixed max bitrate not being set properly. PLEASE NOTE: Setting the max bitrate will cause issues such as your preview not working when you perform certain actions. I can't figure out why this happens. The description for the option has been updated to warn users of this.",
+                "Fixed min, target, and max bitrates setting incorrect default bitrates when set to a negative number with Custom Bitrate on.",
+                "Updated min, target, and max bitrate descriptions. (The Discord default bitrate changes depending on what quality settings you use)",
+                "Added NaN checks to the resolution swapper.",
+                "Added a warning message if you press Copy 3y3 when the PFP or Banner textareas are empty"
+            ]
+        }
+    ],
     settingsPanel: [
         {
             type: "category",
@@ -189,10 +209,17 @@ const config = {
                 { type: "text", id: "CustomFPS", name: "FPS", note: "The custom FPS you want to stream at.", value: () => settings.CustomFPS },
                 { type: "switch", id: "ResolutionSwapper", name: "Stream Settings Quick Swapper", note: "Lets you change your custom resolution and FPS quickly in the stream settings modal!", value: () => settings.ResolutionSwapper },
                 { type: "switch", id: "CustomBitrateEnabled", name: "Custom Bitrate", note: "Choose the bitrate for your streams!", value: () => settings.CustomBitrateEnabled },
-                { type: "text", id: "minBitrate", name: "Minimum Bitrate", note: "The minimum bitrate (in kbps). If this is set to a negative number, the Discord default of 150kbps will be used.", value: () => settings.minBitrate },
-                { type: "text", id: "targetBitrate", name: "Target Bitrate", note: "The target bitrate (in kbps). If this is set to a negative number, the Discord default of 600kbps will be used.", value: () => settings.targetBitrate },
-                { type: "text", id: "maxBitrate", name: "Maximum Bitrate", note: "The maximum bitrate (in kbps). If this is set to a negative number, the Discord default of 2500kbps will be used.", value: () => settings.maxBitrate },
-                { type: "text", id: "voiceBitrate", name: "Voice Audio Bitrate", note: "Allows you to change the voice bitrate to whatever you want. Does not allow you to go over the voice channel's set bitrate but it does allow you to go much lower. (bitrate in kbps). Disabled if this is set to 128 or -1.", value: () => settings.voiceBitrate },
+                { type: "text", id: "minBitrate", name: "Minimum Bitrate", note: "The minimum bitrate (in kbps). If this is set to a negative number, the default for your quality choices is used.", value: () => settings.minBitrate },
+                { type: "text", id: "targetBitrate", name: "Target Bitrate", note: "The target bitrate (in kbps). If this is set to a negative number, the default for your quality choices is used.", value: () => settings.targetBitrate },
+                { type: "text", id: "maxBitrate", name: "Maximum Bitrate",
+                    note: `The maximum bitrate (in kbps). If this is set to a negative number, the default for your quality choices is used. 
+                    The default max bitrate for free quality options is 3500kbps, and for Nitro quality options (higher than 720p or higher than 30fps) it is 9000kbps as of April 2025. 
+                    There is also a strange bug(?) where setting your max bitrate will cause issues with your stream's preview. 
+                    If you want to avoid these issues, please disable this option.`, value: () => settings.maxBitrate },
+                { type: "text", id: "voiceBitrate", name: "Voice Audio Bitrate", note: `
+                    Allows you to change the voice bitrate to whatever you want. 
+                    Does not allow you to go over the voice channel's set bitrate but it does allow you to go much lower. 
+                    Bitrate in kbps. Disabled if this is set to -1.`, value: () => settings.voiceBitrate },
                 {
                     type: "dropdown", id: "videoCodec2", name: "Force Video Codec (Advanced Users Only)", note: `
                     Allows you to force a specified video codec to be used. Normally, Discord would automatically 
@@ -277,7 +304,10 @@ const config = {
             settings: [
                 { type: "switch", id: "useClipBypass", name: "Use Clips Bypass", note: "Enabling this will effectively set your file upload limit for video files to 100MB. Disable this if you have a file upload limit larger than 100MB. Enabling this option will also enable Experiments.", value: () => settings.useClipBypass },
                 { type: "switch", id: "alwaysTransmuxClips", name: "Force Transmuxing", note: "Always transmux the video, even if transmuxing would normally be skipped. Transmuxing is only ever skipped if the codec does not include AVC1 or includes MP42.", value: () => settings.alwaysTransmuxClips },
-                { type: "switch", id: "forceClip", name: "Force Clip", note: "Always send video files as a clip, even if the size is below 10MB.", value: () => settings.forceClip }
+                { type: "switch", id: "forceClip", name: "Force Clip", note: "Always send video files as a clip, even if the size is below 10MB. I recommend that you leave this option disabled.", value: () => settings.forceClip },
+                { type: "switch", id: "useAudioClipBypass", name: "Audio Clips Bypass", note: "Identical to the Clips Bypass for videos, except it works with audio files.", value: () => settings.useAudioClipBypass },
+                { type: "switch", id: "forceAudioClip", name: "Force Audio Clip", note: "Always send audio files as a clip, even if the size is below 10MB. I recommend that you leave this option disabled.", value: () => settings.forceAudioClip },
+                // { type: "switch", id: "enableClipsExperiment", name: "Enable Clips Experiments", note: "Whether or not Clips-related experiments should be enabled. Doesn't disable on the fly, reload your client.", value: () => settings.enableClipsExperiment}
             ]
         },
         {
@@ -356,9 +386,8 @@ module.exports = class FakeNitro {
             }
         }
 
-        if(settings.CustomFPS == 15) settings.CustomFPS = 16;
-        if(settings.CustomFPS == 30) settings.CustomFPS = 31;
-        if(settings.CustomFPS == 5) settings.CustomFPS = 6;
+        if(isNaN(settings.CustomFPS)) settings.CustomFPS = 60;
+        if(isNaN(settings.CustomResolution)) settings.CustomResolution = 1440;
 
         if(settings.ResolutionSwapper){
             try {
@@ -525,12 +554,15 @@ module.exports = class FakeNitro {
         });
 
         //Clips Bypass
-        if(settings.useClipBypass){
+        if(settings.useClipBypass || settings.useAudioClipBypass){
             try {
+                //if(settings.enableClipsExperiment){
                 this.experiments();
                 this.overrideExperiment("2023-09_clips_nitro_early_access", 2);
                 this.overrideExperiment("2022-11_clips_experiment", 1);
                 this.overrideExperiment("2023-10_viewer_clipping", 1);
+                //}
+                
 
                 this.clipsBypass();
             } catch(err){
@@ -564,61 +596,162 @@ module.exports = class FakeNitro {
             //Only if the selected preset is "Custom"
             if(args.selectedPreset === 3){
                 //Preparations 
-                const streamQualityButtonsSection = ret.props.children.props.children.props.children[1].props.children[0].props.children;
+                const childrenOfParentOfQualityButtonsSection = ret?.props?.children?.props?.children?.props?.children[1]?.props?.children;
+                const streamQualityButtonsSection = childrenOfParentOfQualityButtonsSection[0]?.props?.children;
 
-                const resolutionButtonsSection = streamQualityButtonsSection[0].props;
-                const thirdResolutionButton = resolutionButtonsSection.children.props.buttons[2];
+                const resolutionButtonsSection = streamQualityButtonsSection[0]?.props;
 
-                const fpsButtonsSection = streamQualityButtonsSection[1].props;
-                const thirdFpsButton = fpsButtonsSection.children.props.buttons[2];
-
-
-                //make each section into arrays so we can add another element
-                resolutionButtonsSection.children = [resolutionButtonsSection.children];
-                fpsButtonsSection.children = [fpsButtonsSection.children];
+                const fpsButtonsSection = streamQualityButtonsSection[1]?.props;
 
                 //Resolution input
-                resolutionButtonsSection.children.push(React.createElement("div", {
-                    children: [
-                        React.createElement("h1", {
-                            children: "CUSTOM RESOLUTION",
-                            className: `${TextClasses.h5} ${TextClasses.eyebrow} ${this.FormModalClasses.formItemTitleSlim}`
-                        }),
-                        React.createElement(Components.NumberInput, {
-                            value: settings.CustomResolution,
-                            onChange: (input) => {
-                                settings.CustomResolution = input;
-                                //updates visual
-                                thirdResolutionButton.value = input;
-                                //sets values and saves to settings
-                                this.unlockAndCustomizeStreamButtons();
-                                //simulate click on button -- serves to both select it and to make react re-render it.
-                                thirdResolutionButton.onClick();
-                            }
-                        })
-                    ]
-                }));
+                if(resolutionButtonsSection?.children){
+                    //make each section into arrays so we can add another element
+                    resolutionButtonsSection.children = [resolutionButtonsSection.children];
+                    const thirdResolutionButton = resolutionButtonsSection?.children[0]?.props?.buttons[2];
 
-                fpsButtonsSection.children.push(React.createElement("div", {
-                    children: [
-                        React.createElement("h1", {
-                            children: "CUSTOM FRAME RATE",
-                            className: `${TextClasses.h5} ${TextClasses.eyebrow} ${this.FormModalClasses.formItemTitleSlim}`
-                        }),
-                        React.createElement(Components.NumberInput, {
-                            value: settings.CustomFPS,
-                            onChange: (input) => {
-                                settings.CustomFPS = input;
-                                //updates visual
-                                thirdFpsButton.value = input;
-                                //sets values and saves to settings
-                                this.unlockAndCustomizeStreamButtons();
-                                //simulate click on button -- serves to both select it and to make react re-render it.
-                                thirdFpsButton.onClick();
-                            }
-                        })
-                    ]
-                }));
+                    resolutionButtonsSection?.children?.push(React.createElement("div", {
+                        children: [
+                            React.createElement("h1", {
+                                children: "CUSTOM RESOLUTION",
+                                className: `${TextClasses.h5} ${TextClasses.eyebrow} ${this.FormModalClasses.formItemTitleSlim}`
+                            }),
+                            React.createElement(Components.NumberInput, {
+                                value: settings.CustomResolution,
+                                min: -1,
+                                onChange: (input) => {
+                                    input = parseInt(input);
+                                    if(isNaN(input)) input = 1440;
+                                    settings.CustomResolution = input;
+                                    //updates visual
+                                    thirdResolutionButton.value = input;
+                                    //sets values and saves to settings
+                                    this.unlockAndCustomizeStreamButtons();
+                                    //simulate click on button -- serves to both select it and to make react re-render it.
+                                    thirdResolutionButton.onClick();
+                                }
+                            })
+                        ]
+                    }));
+                }
+                
+                if(fpsButtonsSection?.children){
+
+                    fpsButtonsSection.children = [fpsButtonsSection.children];
+
+                    const thirdFpsButton = fpsButtonsSection?.children[0]?.props?.buttons[2];
+
+                    fpsButtonsSection?.children.push(React.createElement("div", {
+                        children: [
+                            React.createElement("h1", {
+                                children: "CUSTOM FRAME RATE",
+                                className: `${TextClasses.h5} ${TextClasses.eyebrow} ${this.FormModalClasses.formItemTitleSlim}`
+                            }),
+                            React.createElement(Components.NumberInput, {
+                                value: settings.CustomFPS,
+                                min: -1,
+                                onChange: (input) => {
+                                    input = parseInt(input);
+                                    if(isNaN(input)) input = 60;
+                                    settings.CustomFPS = input;
+                                    //updates visual
+                                    thirdFpsButton.value = input;
+                                    //sets values and saves to settings
+                                    this.unlockAndCustomizeStreamButtons();
+                                    //simulate click on button -- serves to both select it and to make react re-render it.
+                                    thirdFpsButton.onClick();
+                                }
+                            })
+                        ]
+                    }));
+                }
+
+                if(settings.CustomBitrateEnabled){
+                    if(childrenOfParentOfQualityButtonsSection){
+                        childrenOfParentOfQualityButtonsSection.push(React.createElement("br"));
+
+                        childrenOfParentOfQualityButtonsSection.push(React.createElement(Components.SettingGroup, {
+                            name: "Bitrate",
+                            collapsible: true,
+                            shown: false,
+                            children: [
+                                //headers
+                                React.createElement('div', {
+                                    style: {
+                                        display: "flex",
+                                        width: "100%",
+                                        justifyContent: "space-around"
+                                    },
+                                    children: [
+                                        React.createElement("h1", {
+                                            children: "MIN",
+                                            style: {
+                                                marginBlock: "0 5px",
+                                            },
+                                            className: `${TextClasses.h5} ${TextClasses.eyebrow} ${this.FormModalClasses.formItemTitleSlim}`
+                                        }),
+                                        React.createElement("h1", {
+                                            children: "TARGET",
+                                            style: {
+                                                marginBlock: "0 5px",
+                                            },
+                                            className: `${TextClasses.h5} ${TextClasses.eyebrow} ${this.FormModalClasses.formItemTitleSlim}`
+                                        }),
+                                        React.createElement("h1", {
+                                            children: "MAX",
+                                            style: {
+                                                marginBlock: "0 5px",
+                                            },
+                                            className: `${TextClasses.h5} ${TextClasses.eyebrow} ${this.FormModalClasses.formItemTitleSlim}`
+                                        }),
+                                    ]
+                                }),
+                                React.createElement('div', {
+                                    style: {
+                                        display: "flex",
+                                        width: "100%",
+                                        justifyContent: "space-around",
+                                        marginBottom: "5px"
+                                    },
+                                    children: [
+                                        React.createElement(Components.NumberInput, {
+                                            value: settings.minBitrate,
+                                            min: -1,
+                                            onChange: (input) => {
+                                                input = parseInt(input);
+                                                if(isNaN(input)) input = -1;
+                                                settings.minBitrate = input;
+                                                //save to settings
+                                                Data.save(this.meta.name, "settings", settings);
+                                            }
+                                        }),
+                                        React.createElement(Components.NumberInput, {
+                                            value: settings.targetBitrate,
+                                            min: -1,
+                                            onChange: (input) => {
+                                                input = parseInt(input);
+                                                if(isNaN(input)) input = -1;
+                                                settings.targetBitrate = input;
+                                                //save to settings
+                                                Data.save(this.meta.name, "settings", settings);
+                                            }
+                                        }),
+                                        React.createElement(Components.NumberInput, {
+                                            value: settings.maxBitrate,
+                                            min: -1,
+                                            onChange: (input) => {
+                                                input = parseInt(input);
+                                                if(isNaN(input)) input = -1;
+                                                settings.maxBitrate = input;
+                                                //save to settings
+                                                Data.save(this.meta.name, "settings", settings);
+                                            }
+                                        }),
+                                    ]
+                                })
+                            ]
+                        }));
+                    }
+                }
             }
         });
     }
@@ -648,7 +781,7 @@ module.exports = class FakeNitro {
         });
     }
 
-    // #region Clips Bypass
+    // #region Clips Bypasses
     async clipsBypass(){
         if(!this.MP4Box){
             try{
@@ -658,19 +791,42 @@ module.exports = class FakeNitro {
         }
         if(ffmpeg == undefined) await this.loadFFmpeg();
 
-        async function ffmpegTransmux(arrayBuffer, fileName = "input.mp4"){
+        async function ffmpegTransmux(arrayBuffer, inFileName = "input.mp4", ffmpegArguments, outFileName = "output.mp4"){
             if(ffmpeg){
-                //UI.showToast("Transmuxing video...", { type: "info" });
-                ffmpeg.on("log", ({ message }) => {
-                    console.log(message);
-                });
-                await ffmpeg.writeFile(fileName, new Uint8Array(arrayBuffer));
-                await ffmpeg.exec(["-i", fileName, "-codec", "copy", "-brand", "isom/avc1", "-movflags", "+faststart", "-map", "0", "-map_metadata", "-1", "-map_chapters", "-1", "output.mp4"]);
-                const data = await ffmpeg.readFile('output.mp4');
+                if(!ffmpegArguments)
+                    ffmpegArguments = ["-i",inFileName,"-codec","copy","-brand","isom/avc1","-movflags","+faststart",
+                                       "-map","0","-map_metadata","-1","-map_chapters","-1",outFileName];
+                
+                await ffmpeg.writeFile(inFileName, new Uint8Array(arrayBuffer));
+                console.log("Approximately equivalent ffmpeg command:");
+                console.log("ffmpeg " + ffmpegArguments.join(" "));
+                await ffmpeg.exec(ffmpegArguments);
+                const data = await ffmpeg.readFile(outFileName);
+                
+                ffmpeg.deleteFile(inFileName);
+                ffmpeg.deleteFile(outFileName);
+                
+                if(data.length == 0){
+                    throw new Error(`An error occurred during muxing/encoding: Output file ended up empty or doesn't exist,
+                                    likely due to an FFmpeg error. Please check the FFmpeg logs above. If you need assistance,
+                                    please use the support channel in the Discord server.`);
+                }
 
                 return data.buffer;
             }
         }
+        async function ffmpegAudioTransmux(arrayBuffer, inFileName = "input.mp3", outFileName = "output.mp4"){
+
+            let ffmpegArgs = ["-f","lavfi","-i","color=c=black:s=500x2","-i",inFileName,"-shortest","-fflags","+shortest", 
+                "-brand","isom/avc1","-movflags","+faststart","-map_metadata","-1","-map_chapters","-1",
+                "-preset","ultrafast","-c:a","copy","-strict","-2", outFileName];
+
+            return await ffmpegTransmux(arrayBuffer, inFileName, ffmpegArgs, outFileName);
+        }
+
+        const skippedAudioTypes = ['audio/mid','audio/basic','audio/mpegurl','audio/3gp'];
+        const skippedVideoTypes = ['video/3gp',"video/asf",'video/ivf'];
+
         Patcher.instead(this.meta.name, addFilesMod, "addFiles", async (_, [args], originalFunction) => {
             /* If ffmpeg isn't loaded, or was unloaded for some reason,
                when the user adds a file, make sure to load it again if it's undefined
@@ -678,31 +834,41 @@ module.exports = class FakeNitro {
                trigger saveAndUpdate or restart the plugin to
                make ffmpeg load if it wasn't loaded properly the first time. */
             if(ffmpeg == undefined) await this.loadFFmpeg();
-            
+
+            function errorHandler(err, currentFile, name) {
+                UI.showToast("Something went wrong. See console for details.", { type: "error", forceShow: true });
+                Logger.error(name, err);
+                if(currentFile) {
+                    Logger.info(name, "Current file information for debugging:");
+                    Logger.info(name, currentFile);
+                    Logger.info(name, `File Type: "${currentFile.file?.type}"`);
+                }
+            }
+			
             //for each file being added
             for(let i = 0; i < args.files.length; i++){
                 const currentFile = args.files[i];
 
                 if(currentFile.file.name.endsWith(".dlfc")) return;
 
-                //larger than 10mb
-                if(currentFile.file.size > 10485759 || settings.forceClip){
-                    const clipData = {
-                        "id": "",
-                        "version": 3,
-                        "applicationName": "",
-                        "applicationId": "1301689862256066560",
-                        "users": [
-                            CurrentUser.id
-                        ],
-                        "clipMethod": "manual",
-                        "length": currentFile.file.size,
-                        "thumbnail": "",
-                        "filepath": "",
-                        "name": currentFile.file.name.substring(0, currentFile.file.name.lastIndexOf('.'))
-                    };
-                    
-                    //if this file is an mp4 file
+                const clipData = {
+                    "id": "",
+                    "version": 3,
+                    "applicationName": "",
+                    "applicationId": "1301689862256066560",
+                    "users": [
+                        CurrentUser.id
+                    ],
+                    "clipMethod": "manual",
+                    "length": currentFile.file.size,
+                    "thumbnail": "",
+                    "filepath": "",
+                    "name": currentFile.file.name.substring(0, currentFile.file.name.lastIndexOf('.'))
+                };
+
+                //larger than 10mb or force video clip enabled AND video clip bypass enabled
+                if((currentFile.file.size > 10485759 || settings.forceClip) && settings.useClipBypass){
+					//if this file is an mp4 file
                     if(currentFile.file.type == "video/mp4"){
                         let dontStopMeNow = true;
                         let mp4BoxFile = this.MP4Box.createFile();
@@ -715,7 +881,7 @@ module.exports = class FakeNitro {
 
                             try {
                                 //check if file is H264 or H265
-                                if(info.videoTracks[0].codec.startsWith("avc") || info.videoTracks[0].codec.startsWith("hev1")){
+                                if(info.videoTracks[0]?.codec?.startsWith("avc") || info.videoTracks[0]?.codec?.startsWith("hev1")){
 
                                     let hasTransmuxed = false;
                                     if(!info.brands.includes("avc1") || info.brands.includes("mp42") || settings.alwaysTransmuxClips){
@@ -757,8 +923,7 @@ module.exports = class FakeNitro {
                                 //send as a "clip"
                                 currentFile.clip = clipData;
                             } catch(err){
-                                UI.showToast("Something went wrong. See console for details.", { type: "error" });
-                                Logger.error(this.meta.name, err);
+                                errorHandler(err, currentFile, this.meta.name);
                             } finally {
                                 dontStopMeNow = false;
                             }
@@ -777,17 +942,31 @@ module.exports = class FakeNitro {
                         while (dontStopMeNow){
                             await new Promise(r => setTimeout(r, 10));
                         }
-                    }else if(currentFile.file.type.startsWith("video/")){
+                    
+                    }
+                    else if(currentFile.file.name.toLowerCase().endsWith(".mod") && currentFile.file.type == 'video/mpeg'){
+                        continue;
+                    }
+                    else if(currentFile.file.type.startsWith("video/") && !skippedVideoTypes.includes(currentFile.file.type)){
                         //Is a video file, but not MP4
 
+                        let outFileName = "output.mp4";
+
                         //AVI file warning
-                        if(currentFile.file.type == "video/x-msvideo"){
-                            UI.showToast("[FakeNitro] NOTE: AVI Files will send, but HTML5 does not support playing AVI video codecs!", { type: "warning" });
+                        if(currentFile.file.type == "video/avi"){
+                            UI.showToast("[FakeNitro] NOTE: AVI Files may send, but HTML5 and MP4 do not support all AVI video codecs, it may not play and FFmpeg may error!", { type: "warning" });
                         }
                         try {
                             let arrayBuffer = await currentFile.file.arrayBuffer();
+                            const movTypes = ["video/flv", "video/ogg", "video/wmv", "video/mov"];
+                            if(movTypes.includes(currentFile.file.type)){
+                                Logger.info(this.meta.name, 'Using MOV format for clip.');
+                                
+                                outFileName = "output.mov";
+                            }
 
-                            let array1 = ArrayBuffer.concat(await ffmpegTransmux(arrayBuffer, currentFile.file.name), udtaBuffer);
+                            let array1 = ArrayBuffer.concat(await ffmpegTransmux(arrayBuffer, currentFile.file.name, undefined, outFileName), udtaBuffer);
+
                             let video = new File([new Uint8Array(array1)], currentFile.file.name.substr(0, currentFile.file.name.lastIndexOf(".")) + ".mp4", { type: "video/mp4" });
 
                             currentFile.file = video;
@@ -795,12 +974,42 @@ module.exports = class FakeNitro {
                             //send as a "clip"
                             currentFile.clip = clipData;
                         } catch(err){
-                            UI.showToast("Something went wrong. See console for details.", { type: "error" });
-                            Logger.error(this.meta.name, err);
+                            errorHandler(err, currentFile, this.meta.name);
+                            continue;
                         }
                     }
-                    currentFile.platform = 1;
                 }
+                //Audio file above 10mb or Force Audio Clip and it not an incompatible type and useAudioClipBypass is true
+                if(settings.useAudioClipBypass && (currentFile.file.size > 10485759 || settings.forceAudioClip) &&
+                   (currentFile.file.type.startsWith("audio/") && !skippedAudioTypes.includes(currentFile.file.type))){
+
+                    try {
+                        let arrayBuffer = await currentFile.file.arrayBuffer();
+
+                        let outFileName = "output.mp4";
+
+                        if(['audio/wav', 'audio/aiff', 'audio/x-ms-wma'].includes(currentFile.file.type)){
+                            Logger.info("FakeNitro", 'Using MOV format for audio clip.');
+                            outFileName = 'output.mov';
+                        }
+                        if(currentFile.file.type == 'audio/vnd.dolby.dd-raw'){
+                            UI.showToast("AC3 should send but playback is not supported!", {type: "warn"});
+                        }
+
+                        let array1 = ArrayBuffer.concat(await ffmpegAudioTransmux(arrayBuffer, currentFile.file.name, outFileName), udtaBuffer);
+
+                        let video = new File([new Uint8Array(array1)], clipData.name + ".mp4", { type: "video/mp4" });
+
+                        currentFile.file = video;
+
+                        //send as a "clip"
+                        currentFile.clip = clipData;
+                    } catch(err){
+                        errorHandler(err, currentFile, this.meta.name);
+                        continue;
+                    }
+                }
+                currentFile.platform = 1;
             }
             originalFunction(args);
         });
@@ -828,6 +1037,25 @@ module.exports = class FakeNitro {
         Patcher.instead(this.meta.name, ClipsMod, "isVoiceRecordingAllowedForUser", () => {
             return true;
         });
+        /* Patcher.instead(this.meta.name, FileTooLargeMod, "isOversize", (_, [fileList, id], originalFunction) => {
+            let isClip = false;
+            for(let i = 0; i < fileList.length; i++){
+                let file = fileList[i];
+                if(settings.useClipBypass){
+                    if(file.type.startsWith("video/")){
+                        isClip = true;
+                    }
+                }
+                if(settings.useAudioClipBypass){
+                    if(file.type.startsWith("audio/")){
+                        isClip = true;
+                    }
+                }
+            }
+            if(isClip) return false;
+            else return originalFunction(fileList, id);
+        }); */
+        
     } //End of clipsBypass()
     // #endregion
 
@@ -836,17 +1064,35 @@ module.exports = class FakeNitro {
         const defineTemp = window.global.define;
 
         let ffmpegScript = document.getElementById("ffmpegScript");
-        if(ffmpegScript){
+        if(ffmpegScript) {
             ffmpegScript.remove();
         }
 
-        try {
+        async function fetchAndRetryWithNetFetch(filename){
             const ffmpeg_js_baseurl = "https://raw.githubusercontent.com/riolubruh/YABDP4Nitro/refs/heads/main/ffmpeg/";
-            //load ffmpeg worker
-            const ffmpegWorkerURL = URL.createObjectURL(await (await fetch(ffmpeg_js_baseurl + "814.ffmpeg.js", { timeout: 100000 })).blob());
+            let res = await fetch(ffmpeg_js_baseurl + filename, { timeout: 100000, cache: "force-cache" });
+            if(res.ok) {
+                return res;
+            } else {
+                Logger.warn("FakeNitro", res);
+                res = await Net.fetch(ffmpeg_js_baseurl + filename, { timeout: 100000 });
+                if(res.ok){
+                    return res;
+                }else{
+                    Logger.error("FakeNitro", res);
+                    throw new Error(filename + " failed to fetch.");
+                }
+            }
+        }
 
-            //load FFmpeg.WASM
-            let ffmpegSrc = await (await fetch(ffmpeg_js_baseurl + "ffmpeg.js")).text();
+        try {
+
+            //load 814.ffmpeg.js (ffmpeg worker)
+            let ffmpegWorkerURL = URL.createObjectURL(await (await fetchAndRetryWithNetFetch("814.ffmpeg.js")).blob());
+            
+
+            //load FFmpeg.js as text
+            let ffmpegSrc = await (await fetchAndRetryWithNetFetch("ffmpeg.js")).text();
 
             //patch worker URL in the source of ffmpeg.js (why is this a problem lmao)
             ffmpegSrc = ffmpegSrc.replace(`new URL(e.p+e.u(814),e.b)`, `"${ffmpegWorkerURL.toString()}"`);
@@ -869,19 +1115,31 @@ module.exports = class FakeNitro {
 
             window.global.define = defineTemp;
 
-            ffmpeg = new FFmpegWASM.FFmpeg();
+            //load ffmpeg core
+            let ffmpegCoreURL = URL.createObjectURL(await (await fetchAndRetryWithNetFetch("ffmpeg-core.js")).blob());
 
-            const ffmpegCoreURL = URL.createObjectURL(await (await fetch(ffmpeg_js_baseurl + "ffmpeg-core.js", { timeout: 100000 })).blob());
+            let ffmpegCoreWasmURL = URL.createObjectURL(await (await fetchAndRetryWithNetFetch("ffmpeg-core.wasm")).blob());
 
-            const ffmpegCoreWasmURL = URL.createObjectURL(await (await fetch(ffmpeg_js_baseurl + "ffmpeg-core.wasm", { timeout: 100000 })).blob());
+            if(FFmpegWASM && ffmpegCoreURL && ffmpegCoreWasmURL && ffmpegWorkerURL) {
+                ffmpeg = new FFmpegWASM.FFmpeg();
 
-            await ffmpeg.load({
-                coreURL: ffmpegCoreURL,
-                wasmURL: ffmpegCoreWasmURL
-            });
-            Logger.info(this.meta.name, "FFmpeg load success!");
-        } catch(err){
-            UI.showToast("An error occured trying to load FFmpeg.wasm. Check console for details.", { type: "error" });
+                await ffmpeg.load({
+                    coreURL: ffmpegCoreURL,
+                    wasmURL: ffmpegCoreWasmURL
+                });
+                Logger.info(this.meta.name, "FFmpeg load success!");
+                ffmpeg.on("log", ({ message }) => {
+                    console.log(message);
+                });
+            }else{
+                Logger.info(this.meta.name, FFmpegWASM);
+                Logger.info(this.meta.name, ffmpegCoreURL);
+                Logger.info(this.meta.name, ffmpegCoreWasmURL);
+                Logger.info(this.meta.name, ffmpegWorkerURL);
+                throw new Error("One or more of the necessary components failed to load.");
+            }
+        } catch(err) {
+            UI.showToast("An error occured trying to load FFmpeg.wasm. Check console for details.", { type: "error", forceShow: true });
             Logger.info(this.meta.name, "FFmpeg failed to load. The clips bypass will not work without this unless the file is already the correct format! Error details below.");
             Logger.error(this.meta.name, err);
         } finally {
@@ -1093,6 +1351,10 @@ module.exports = class FakeNitro {
         //store avatar customization section renderer module
         if(this.customPFPSettingsRenderMod == undefined) this.customPFPSettingsRenderMod = Webpack.getByStrings("showRemoveAvatarButton", "isTryItOutFlow", { defaultExport: false });
 
+        function emptyWarn(){
+            UI.showToast("No URL was provided. Please enter an Imgur URL.", {type: "warning"});
+        }
+
         Patcher.after(this.meta.name, this.customPFPSettingsRenderMod, "Z", (_, [args], ret) => {
 
             //don't need to do anything if this is the "Try out Nitro" flow.
@@ -1128,8 +1390,10 @@ module.exports = class FakeNitro {
                         let profilePictureUrlInputValue = String(document.getElementById("profilePictureUrlInput").value);
 
                         //empty, skip.
-                        if(profilePictureUrlInputValue == "") return;
-                        if(profilePictureUrlInputValue == undefined) return;
+                        if(profilePictureUrlInputValue == undefined || profilePictureUrlInputValue == ""){
+                            emptyWarn();
+                            return;
+                        }
 
                         //clean up string to encode
                         let stringToEncode = "" + profilePictureUrlInputValue
@@ -1164,12 +1428,12 @@ module.exports = class FakeNitro {
                                         .split("?")[0]; //remove any URL parameters since we don't want or need them
                                 } catch(err){
                                     Logger.error(this.meta.name, err);
-                                    BdApi.UI.showToast("An error occurred. Are there multiple images in this album/gallery?", { type: "error" });
+                                    BdApi.UI.showToast("An error occurred. Are there multiple images in this album/gallery?", { type: "error", forceShow: true });
                                     return;
                                 }
                             }
                             if(stringToEncode == ""){
-                                BdApi.UI.showToast("An error occurred: couldn't find file name.", { type: "error" });
+                                BdApi.UI.showToast("An error occurred: couldn't find file name.", { type: "error", forceShow: true });
                                 Logger.error(this.meta.name, "Couldn't find file name for some reason. Contact Riolubruh!");
                             }
 
@@ -1192,7 +1456,7 @@ module.exports = class FakeNitro {
                             DiscordNative.clipboard.copy(encodedStr);
                             UI.showToast("3y3 copié avec succés!", { type: "info" });    
                         }catch(err){
-                            UI.showToast("Failed to copy to clipboard!", { type: "error" });   
+                            UI.showToast("Failed to copy to clipboard!", { type: "error", forceShow: true });   
                             Logger.error(this.meta.name, err);
                         }
                     } //end copy pfp 3y3 click event
@@ -1230,16 +1494,15 @@ module.exports = class FakeNitro {
                 badgesList.push(ret.badges[i].id); //add each of this user's badge IDs to badgesList
             }
 
-            //if list of users that should have yabdp_user badge includes current user, and they don't already have the badge applied,
-            if(badgeUserIDs.includes(ret.userId) && !badgesList.includes("nitro_user")){
-                //add the yabdp user badge to the user's list of badges.
+            //if list of users that should have nitro_user badge includes current user, and they don't already have the badge applied,
+            if(badgeUserIDs.includes(ret.userId) && !badgesList.includes("fakenitro_user")){
+                //add the fakenitro user badge to the user's list of badges.
                 ret.badges.push({
                     id: "nitro_user",
                     icon: "2ba85e8026a8614b640c2837bcdfe21b", //Nitro icon, gets replaced later.
                     description: "Abonné depuis le 28 févr. 2018",
                     link: "https://discord.com/settings/premium" //this link opens upon clicking the badge.
-             });
-
+                });
             }
 
         }); //End of user profile badge patches
@@ -1352,7 +1615,7 @@ module.exports = class FakeNitro {
                         DiscordNative.clipboard.copy(" " + encodedStr);
                         UI.showToast("3y3 copié avec succés!", { type: "info" });    
                     }catch(err){
-                        UI.showToast("Failed to copy to clipboard!", { type: "error" });   
+                        UI.showToast("Failed to copy to clipboard!", { type: "error", forceShow: true });   
                         Logger.error(this.meta.name, err);
                     }
                 };
@@ -1599,7 +1862,7 @@ module.exports = class FakeNitro {
                             DiscordNative.clipboard.copy(" " + encodedStr);
                             UI.showToast("3y3 copié avec succés!", { type: "info" });    
                         }catch(err){
-                            UI.showToast("Failed to copy to clipboard!", { type: "error" });   
+                            UI.showToast("Failed to copy to clipboard!", { type: "error", forceShow: true });   
                             Logger.error("FakeNitro", err);
                         }
                     },
@@ -1715,7 +1978,7 @@ module.exports = class FakeNitro {
                     Logger.error(this.meta.name, err);
                 }
             }else{
-                //Upload 10 files at a time with a delay
+				//Upload 10 files at a time with a delay
                 let firstTime = true;
                 while (files.length){
                     let tenFiles = files.splice(0, 10);
@@ -2337,37 +2600,28 @@ module.exports = class FakeNitro {
     //#region Video Quality Patch
     videoQualityModule(){ //Custom Bitrates, FPS, Resolution
         Patcher.before(this.meta.name, videoOptionFunctions, "updateVideoQuality", (e) => {
-
-            if(settings.minBitrate > 0 && settings.CustomBitrateEnabled){
-                //Minimum Bitrate
-                e.videoQualityManager.options.videoBitrateFloor = (settings.minBitrate * 1000);
-                e.videoQualityManager.options.videoBitrate.min = (settings.minBitrate * 1000);
-                e.videoQualityManager.options.desktopBitrate.min = (settings.minBitrate * 1000);
-            }else{
-                e.videoQualityManager.options.videoBitrateFloor = 150000;
-                e.videoQualityManager.options.videoBitrate.min = 150000;
-                e.videoQualityManager.options.desktopBitrate.min = 150000;
+            if(settings.CustomBitrateEnabled){
+                if(settings.minBitrate > 0){
+                    //Minimum Bitrate
+                    e.videoQualityManager.options.videoBitrateFloor = (settings.minBitrate * 1000);
+                    e.videoQualityManager.options.videoBitrate.min = (settings.minBitrate * 1000);
+                    e.videoQualityManager.options.desktopBitrate.min = (settings.minBitrate * 1000);
+                }
+    
+                if(settings.maxBitrate > 0){
+                    //Maximum Bitrate
+                    e.videoQualityManager.options.videoBitrate.max = (settings.maxBitrate * 1000);
+                    e.videoQualityManager.options.desktopBitrate.max = (settings.maxBitrate * 1000);
+                    e.videoQualityManager.goliveMaxQuality.bitrateMax = (settings.maxBitrate * 1000);
+                }
+    
+                if(settings.targetBitrate > 0){
+                    //Target Bitrate
+                    e.videoQualityManager.options.desktopBitrate.target = (settings.targetBitrate * 1000);
+                }
             }
 
-            if(settings.maxBitrate > 0 && settings.CustomBitrateEnabled){
-                //Maximum Bitrate
-                e.videoQualityManager.options.videoBitrate.max = (settings.maxBitrate * 1000);
-                e.videoQualityManager.options.desktopBitrate.max = (settings.maxBitrate * 1000);
-            }else{
-                //Default max bitrate
-                e.videoQualityManager.options.videoBitrate.max = 2500000;
-                e.videoQualityManager.options.desktopBitrate.max = 2500000;
-            }
-
-            if(settings.targetBitrate > 0 && settings.CustomBitrateEnabled){
-                //Target Bitrate
-                e.videoQualityManager.options.desktopBitrate.target = (settings.targetBitrate * 1000);
-            }else{
-                //Default target bitrate
-                e.videoQualityManager.options.desktopBitrate.target = 600000;
-            }
-
-            if(settings.voiceBitrate != 128 && settings.voiceBitrate != -1){
+            if(settings.voiceBitrate > -1){
                 //Audio Bitrate
                 e.voiceBitrate = settings.voiceBitrate * 1000;
 
@@ -2413,6 +2667,8 @@ module.exports = class FakeNitro {
                 e.videoQualityManager.ladder.ladder = LadderModule.calculateLadder(pixelBudget);
                 e.videoQualityManager.ladder.orderedLadder = LadderModule.calculateOrderedLadder(e.videoQualityManager.ladder.ladder);
             }
+
+            console.log(e);
         });
     } //End of videoQualityModule()
     //#endregion
@@ -2515,7 +2771,7 @@ module.exports = class FakeNitro {
                             DiscordNative.clipboard.copy(encodedStr);
                             UI.showToast("3y3 copié avec succés!", { type: "info" });    
                         }catch(err){
-                            UI.showToast("Failed to copy to clipboard!", { type: "error" });   
+                            UI.showToast("Failed to copy to clipboard!", { type: "error", forceShow: true });   
                             Logger.error("FakeNitro", err);
                         }
                     }
@@ -2627,6 +2883,10 @@ module.exports = class FakeNitro {
         await Webpack.waitForModule(Webpack.Filters.byStrings("showRemoveBannerButton", "isTryItOutFlow", "buttonsContainer"));
         if(this.profileBannerSectionRenderer == undefined) this.profileBannerSectionRenderer = Webpack.getByStrings("showRemoveBannerButton", "isTryItOutFlow", "buttonsContainer", {defaultExport:false});
 
+        function emptyWarn(){
+            UI.showToast("No URL was provided. Please enter an Imgur URL.", {type: "warning"});
+        }
+
         Patcher.after(this.meta.name, this.profileBannerSectionRenderer, "Z", (_, args, ret) => {
             //create and append profileBannerUrlInput input element.
             let profileBannerUrlInput = React.createElement("input", {
@@ -2661,9 +2921,15 @@ module.exports = class FakeNitro {
                         //grab text from banner URL input textarea 
                         let profileBannerUrlInputValue = String(document.getElementById("profileBannerUrlInput").value);
 
-                        //if it's empty, stop processing.
-                        if(profileBannerUrlInputValue == "") return;
-                        if(profileBannerUrlInputValue == undefined) return;
+                        //if it's empty, stop processing and issue a warning.
+                        if(profileBannerUrlInputValue == undefined){
+                            emptyWarn();
+                            return;
+                        }
+                        if(profileBannerUrlInputValue == ""){
+                            emptyWarn();
+                            return;
+                        }
 
                         //clean up string to encode
                         let stringToEncode = "" + profileBannerUrlInputValue
@@ -2704,12 +2970,12 @@ module.exports = class FakeNitro {
                                         .split("?")[0]; //remove any URL parameters since we don't want or need them
                                 } catch(err){
                                     Logger.error(this.meta.name, err);
-                                    BdApi.UI.showToast("An error occurred. Are there multiple images in this album/gallery?", { type: "error" });
+                                    BdApi.UI.showToast("An error occurred. Are there multiple images in this album/gallery?", { type: "error", forceShow: true });
                                     return;
                                 }
                             }
                             if(stringToEncode == ""){
-                                BdApi.UI.showToast("An error occurred: couldn't find file name.", { type: "error" });
+                                BdApi.UI.showToast("An error occurred: couldn't find file name.", { type: "error", forceShow: true });
                                 Logger.error(this.meta.name, "Couldn't find file name for some reason. Contact Riolubruh.");
                             }
                             //add starting "B{" , remove "imgur.com/" , and add ending "}"
@@ -2731,7 +2997,7 @@ module.exports = class FakeNitro {
                             DiscordNative.clipboard.copy(encodedStr);
                             UI.showToast("3y3 copié avec succés!", { type: "info" });    
                         }catch(err){
-                            UI.showToast("Failed to copy to clipboard!", { type: "error" });   
+                            UI.showToast("Failed to copy to clipboard!", { type: "error", forceShow: true });   
                             Logger.error("FakeNitro", err);
                         }
                         
@@ -2822,7 +3088,7 @@ module.exports = class FakeNitro {
         Logger.info(this.meta.name, "A new update is available!");
 
         UI.showConfirmationModal("Update Available", [`Update ${remoteMeta.version} is now available for FakeNitro!`, "Press Download Now to update!"], {
-            confirmText: "Download Now",
+            confirmText: "📥Download Now",
             onConfirm: async (e) => {
                 if(remoteFile){
                     await new Promise(r => require("fs").writeFile(require("path").join(Plugins.folder, `${this.meta.name}.plugin.js`), remoteFile, r));
@@ -2831,7 +3097,7 @@ module.exports = class FakeNitro {
                         currentVersionInfo.hasShownChangelog = false;
                         Data.save(this.meta.name, "currentVersionInfo", currentVersionInfo);
                     } catch(err){
-                        UI.showToast("An error occurred when trying to download the update!", { type: "error" });
+                        UI.showToast("An error occurred when trying to download the update!", { type: "error", forceShow: true });
                     }
                 }
             }
@@ -2873,7 +3139,7 @@ module.exports = class FakeNitro {
 
             if(!currentVersionInfo.hasShownChangelog){
                 UI.showChangelogModal({
-                    title: "YABDP4Nitro Changelog",
+                    title: "Nitro Changelog",
                     subtitle: config.changelog[0].title,
                     changes: [{
                         title: config.changelog[0].title,
