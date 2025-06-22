@@ -188,7 +188,7 @@ const defaultSettings = {
     "customPFPs": true,
     "experiments": false,
     "userPfpIntegration": true,
-    "userBgIntegration": false,
+    "userBgIntegration": true,
     "useClipBypass": true,
     "alwaysTransmuxClips": false,
     "forceClip": false,
@@ -228,14 +228,6 @@ const config = {
         "github": "https://github.com/LeScorpionhacker/modedDiscordNitroPlugin",
         "github_raw": "https://github.com/LeScorpionhacker/modedDiscordNitroPlugin/blob/main/FakeNitro%20by%20S₳₣₩₳₦₁₂₀.plugin.js"
     },
-    changelog: [
-        {
-            title: "6.1.2",
-            items: [
-                "Fixed regression in 6.1.1 that made Fake Avatar Decorations stop working."
-            ]
-        }
-    ],
     settingsPanel: [
         {
             type: "category",
@@ -879,9 +871,9 @@ module.exports = class Fake4Nitro {
                     marginLeft: "10px",
                     whiteSpace: "nowrap"
                 },
-                children: "Changer la plaque nominative [FakeNitro]",
+                children: "Change Nameplate [FakeNitro]",
                 onClick: () => {
-                    UI.showConfirmationModal("Changer la plaque nominative", React.createElement(NameplateList), {cancelText: ""})
+                    UI.showConfirmationModal("Change Nameplate", React.createElement(NameplateList), {cancelText: ""})
                 }
             }))
         });
