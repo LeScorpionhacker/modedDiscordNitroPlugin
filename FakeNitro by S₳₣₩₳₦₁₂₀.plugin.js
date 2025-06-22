@@ -188,7 +188,7 @@ const defaultSettings = {
     "customPFPs": true,
     "experiments": false,
     "userPfpIntegration": true,
-    "userBgIntegration": true,
+    "userBgIntegration": false,
     "useClipBypass": true,
     "alwaysTransmuxClips": false,
     "forceClip": false,
@@ -879,9 +879,9 @@ module.exports = class Fake4Nitro {
                     marginLeft: "10px",
                     whiteSpace: "nowrap"
                 },
-                children: "Change Nameplate [FakeNitro]",
+                children: "Changer la plaque nominative [FakeNitro]",
                 onClick: () => {
-                    UI.showConfirmationModal("Change Nameplate", React.createElement(NameplateList), {cancelText: ""})
+                    UI.showConfirmationModal("Changer la plaque nominative", React.createElement(NameplateList), {cancelText: ""})
                 }
             }))
         });
