@@ -2030,14 +2030,14 @@ module.exports = class YABDP4Nitro {
                         marginTop: "5px",
                         marginLeft: "5px"
                     },
-                    placeholder: "Imgur URL for PFP"
+                    placeholder: "Met ici l'url Imgur de ton avatar"
                 })
             );
 
             //Create and append Copy PFP 3y3 button.
             ret.props.children.props.children.push(
                 React.createElement("button", {
-                    children: "Copy PFP 3y3",
+                    children: "Copier le 3y3 de ton avatar",
                     className: `${buttonClassModule.button} ${buttonClassModule.lookFilled} ${buttonClassModule.colorBrand} ${buttonClassModule.sizeSmall} ${buttonClassModule.grow}`,
                     id: "profilePictureButton",
                     style: {
@@ -3308,7 +3308,7 @@ module.exports = class YABDP4Nitro {
             ret.props.children.props.children.push( //append copy colors 3y3 button
                 React.createElement("button", {
                     id: "copy3y3button",
-                    children: "Copy Colors 3y3",
+                    children: "Copier le 3y3 de thème de profil",
                     className: `${buttonClassModule.button} ${buttonClassModule.lookFilled} ${buttonClassModule.colorBrand} ${buttonClassModule.sizeSmall} ${buttonClassModule.grow}`,
                     style: {
                         marginLeft: "10px",
@@ -3461,7 +3461,7 @@ module.exports = class YABDP4Nitro {
             //create and append profileBannerUrlInput input element.
             let profileBannerUrlInput = React.createElement("input", {
                 id: "profileBannerUrlInput",
-                placeholder: "Imgur URL for Banner",
+                placeholder: "Met ici l url Imgur de ta bannière",
                 style: {
                     float: "right",
                     width: "30%",
@@ -3479,7 +3479,7 @@ module.exports = class YABDP4Nitro {
 
                 React.createElement("button", {
                     id: "profileBannerButton",
-                    children: "Copy Banner 3y3",
+                    children: "Copier le 3y3 de ta bannière",
                     className: `${buttonClassModule.button} ${buttonClassModule.lookFilled} ${buttonClassModule.colorBrand} ${buttonClassModule.sizeSmall} ${buttonClassModule.grow}`,
                     size: "bd-button-small",
                     style: {
