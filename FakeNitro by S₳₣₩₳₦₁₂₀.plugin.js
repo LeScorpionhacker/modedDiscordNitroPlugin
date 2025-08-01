@@ -1,9 +1,9 @@
 /**
  * @name FakeNitro (Modified YABDP4Nitro)
  * @author S₳₣₩₳₦₁₂₀
- * @version 6.1.2
+ * @version 6.2.1
  * @source https://github.com/LeScorpionhacker/modedDiscordNitroPlugin
- * @updateUrl https://github.com/LeScorpionhacker/modedDiscordNitroPlugin/blob/main/FakeNitro%20by%20S₳₣₩₳₦₁₂₀.plugin.jshttps://github.com/LeScorpionhacker/modedDiscordNitroPlugin/blob/main/FakeNitro%20by%20S₳₣₩₳₦₁₂₀.plugin.js
+ * @updateUrl https://raw.githubusercontent.com/LeScorpionhacker/modedDiscordNitroPlugin/refs/heads/main/FakeNitro%20by%20S₳₣₩₳₦₁₂₀.plugin.js
  * @description Unlock all screensharing modes, use cross-server & GIF emotes, and more!
  */
 /*@cc_on
@@ -27,27 +27,6 @@
         shell.Popup("I'm installed!", 0, "Successfully installed", 0x40);
     }
     WScript.Quit();
-
-@else@*/
-
-/*    ***** ATTRIBUTION NOTICE *****
- *
- * FakeNitro is a free BetterDiscord plugin that bypasses and unlocks Nitro-locked features in the Discord client.
- *
- * Copyright (c) 2025 Riolubruh and contributors (S₳₣₩₳₦₁₂₀ is only editor)
- *
- * Licensed under the Non-Profit Open Software License version 3.0 (NPOSL-3.0).
- * You may use, distribute, and modify this code under the terms of this license.
- *
- * Derivative works must be licensed under NPOSL-3.0 (or OSL-3.0 for for-profit use).
- *
- * Removal or modification of this notice in the source code of any Derivative Work
- * of this software violates the terms of the license.
- *
- * This software is provided on an "AS IS" BASIS and WITHOUT WARRANTY, either express or implied,
- * including, without limitation, the warranties of non-infringement, merchantability or fitness for a particular purpose.
- * THE ENTIRE RISK AS TO THE QUALITY OF THIS SOFTWARE IS WITH YOU.
- *
 */
 
 //#region Module Hell
@@ -64,7 +43,6 @@ const {ApplicationStreamFPS,ApplicationStreamFPSButtons,ApplicationStreamFPSButt
     ApplicationStreamResolutionButtons,ApplicationStreamResolutionButtonsWithSuffixLabel,
     ApplicationStreamResolutions} = StreamButtons;
 const CloudUploader = Webpack.getModule(Webpack.Filters.byPrototypeKeys("uploadFileToCloud"),{searchExports: true});
-const Uploader = Webpack.getByKeys("uploadFiles","cancel");
 const UserStore = Webpack.getStore("UserStore");
 const CurrentUser = UserStore.getCurrentUser();
 const ORIGINAL_NITRO_STATUS = CurrentUser.premiumType;
@@ -134,7 +112,7 @@ const MaxFileSizeMod = Webpack.getMangled('.premiumTier].limits.fileSize:', {
 const InvalidStreamSettingsModal = Webpack.getMangled(/\.preset\)&&.{1,3}?===.{1,3}?resolution&&/, {
     areStreamSettingsAllowed: x=>x
 });
-const GoLiveModalV2UpsellMod = BdApi.Webpack.getMangled("onNitroClick:function", {
+const GoLiveModalV2UpsellMod = Webpack.getMangled("onNitroClick:function", {
     GoLiveModalV2Upsell: x=>x==x
 });
 const fs = require("fs");
@@ -200,7 +178,8 @@ const defaultSettings = {
     "zipClip": true,
     "enableClipsExperiment": true,
     "disableUserBadge": false,
-    "nameplatesEnabled": true
+    "nameplatesEnabled": true,
+    "clipTimestamp": 2
 };
 const defaultData = {
     avatarDecorations: {},
@@ -220,10 +199,10 @@ const config = {
         "name": "FakeNitro",
         "authors": [{
             "name": "S₳₣₩₳₦₁₂₀",
-            "discord_id": "1306670547039686667",
+            "discord_id": "1345121900401262612",
             "github_username": "LeScorpionhacker"
         }],
-        "version": "6.1.2",
+        "version": "6.2.1",
         "description": "Unlock all screensharing modes, and use cross-server & GIF emotes!",
         "github": "https://github.com/LeScorpionhacker/modedDiscordNitroPlugin",
         "github_raw": "https://github.com/LeScorpionhacker/modedDiscordNitroPlugin/blob/main/FakeNitro%20by%20S₳₣₩₳₦₁₂₀.plugin.js"
@@ -327,7 +306,7 @@ const config = {
                 { type: "switch", id: "killProfileEffects", name: "Kill Profile Effects", note: "Hate profile effects? Enable this and they'll be gone. All of them. Overrides all profile effects.", value: () => settings.killProfileEffects },
                 { type: "switch", id: "customPFPs", name: "Fake Profile Pictures", note: "Uses invisible 3y3 encoding to allow setting custom profile pictures by hiding an image URL IN YOUR CUSTOM STATUS. Only supports Imgur URLs for security reasons.", value: () => settings.customPFPs },
                 { type: "switch", id: "userPfpIntegration", name: "UserPFP Integration", note: "Imports the UserPFP database so that people who have profile pictures in the UserPFP database will appear with their UserPFP profile picture. There's little reason to disable this.", value: () => settings.userPfpIntegration },
-                { type: "switch", id: "disableUserBadge", name: "Disable User Badge", note: "Disables the FakeNitro User Badge which appears on any user that uses Profile Customization. (client side)", value: () => settings.disableUserBadge },
+                { type: "switch", id: "disableUserBadge", name: "Disable User Badge", note: "Disables the YABDP4Nitro User Badge which appears on any user that uses Profile Customization. (client side)", value: () => settings.disableUserBadge },
                 { type: "switch", id: "nameplatesEnabled", name: "Fake Nameplates", note: "Uses invisible 3y3 encoding to allow setting fake nameplates by hiding the information in your custom status and/or bio. Please paste the 3y3 in one or both of those areas.", value: () => settings.nameplatesEnabled }
             ]
         },
@@ -339,6 +318,12 @@ const config = {
             shown: false,
             settings: [
                 { type: "switch", id: "useClipBypass", name: "Use Clips Bypass", note: "Enabling this will effectively set your file upload limit for video files to 100MB. Disable this if you have a file upload limit larger than 100MB. Enabling this option will also enable Experiments.", value: () => settings.useClipBypass },
+                { type: "dropdown", id: "clipTimestamp", name: "Timestamp", note: "This option lets you choose how the plugin determines the timestamp to put on the generated clip.", value: () => settings.clipTimestamp, options: [
+                        { label: "Zero (January 1st, 2015)", value: 0 },
+                        { label: "Current Date/Time", value: 1 },
+                        { label: "Last Modified Date/Time of File", value: 2 },
+                    ]
+                },
                 { type: "switch", id: "alwaysTransmuxClips", name: "Force Transmuxing", note: "Always transmux the video, even if transmuxing would normally be skipped. Transmuxing is only ever skipped if the codec does not include AVC1 or includes MP42.", value: () => settings.alwaysTransmuxClips },
                 { type: "switch", id: "forceClip", name: "Force Clip", note: "Always send video files as a clip, even if the size is below 10MB. I recommend that you leave this option disabled.", value: () => settings.forceClip },
                 { type: "switch", id: "useAudioClipBypass", name: "Audio Clips Bypass", note: "Identical to the Clips Bypass for videos, except it works with audio files.", value: () => settings.useAudioClipBypass },
@@ -359,7 +344,7 @@ const config = {
                 { type: "switch", id: "removeProfileUpsell", name: "Remove Profile Customization Upsell", note: "Removes the \"Try It Out\" upsell in the profile customization screen and replaces it with the Nitro variant. Note: does not allow you to use Nitro customization on Server Profiles as the API disallows this.", value: () => settings.removeProfileUpsell },
                 { type: "switch", id: "removeScreenshareUpsell", name: "Remove Screen Share Nitro Upsell", note: "Removes the Nitro upsell in the Screen Share quality option menu.", value: () => settings.removeScreenshareUpsell },
                 { type: "switch", id: "unlockAppIcons", name: "App Icons", note: "Unlocks app icons.", value: () => settings.unlockAppIcons },
-                { type: "switch", id: "experiments", name: "Experiments", note: "Unlocks experiments. Use at your own risk.", value: () => settings.experiments },
+                { type: "switch", id: "experiments", name: "Experiments", note: "Unlocks experiments. Soundmoji and Enable Clips Experiments have to be disabled to turn this off. Use at your own risk.", value: () => (settings.experiments || settings.soundmojiEnabled || (settings.useClipBypass && settings.enableClipsExperiment))},
                 { type: "switch", id: "checkForUpdates", name: "Check for Updates", note: "Should the plugin check for updates on startup?", value: () => settings.checkForUpdates }
             ]
         }
@@ -370,7 +355,7 @@ const config = {
 // #endregion
 
 // #region Exports
-module.exports = class Fake4Nitro {
+module.exports = class YABDP4Nitro {
     constructor(meta){
         this.meta = meta;
     }
@@ -647,7 +632,7 @@ module.exports = class Fake4Nitro {
             }
         }
 
-        if(settings.soundmojiEnabled || (settings.emojiBypass && settings.emojiBypassType == 0)){
+        if(settings.soundmojiEnabled || (settings.emojiBypass && settings.emojiBypassType == 0) || settings.stickerBypass){
             try{
                 this._sendMessageInsteadPatch();
             }catch(err){
@@ -838,9 +823,9 @@ module.exports = class Fake4Nitro {
                             //copy to clipboard
                             try{
                                 DiscordNative.clipboard.copy(" " + encodedStr);
-                                UI.showToast("3y3 copied to clipboard!", { type: "info" });    
+                                UI.showToast("3y3 copié avec succés!", { type: "info" });    
                             }catch(err){
-                                UI.showToast("Failed to copy to clipboard!", { type: "error", forceShow: true });   
+                                UI.showToast("Une erreur est survenue...", { type: "error", forceShow: true });   
                                 Logger.error("FakeNitro", err);
                             }
                         },
@@ -871,9 +856,9 @@ module.exports = class Fake4Nitro {
                     marginLeft: "10px",
                     whiteSpace: "nowrap"
                 },
-                children: "Change Nameplate [FakeNitro]",
+                children: "Changer la plaque nominative[FakeNitro]",
                 onClick: () => {
-                    UI.showConfirmationModal("Change Nameplate", React.createElement(NameplateList), {cancelText: ""})
+                    UI.showConfirmationModal("Changer la plaque nominative", React.createElement(NameplateList), {cancelText: ""})
                 }
             }))
         });
@@ -1329,7 +1314,7 @@ module.exports = class Fake4Nitro {
         async function ffmpegTransmux(arrayBuffer, inFileName = "input.mp4", ffmpegArguments, outFileName = "output.mp4"){
             if(ffmpeg){
                 if(!ffmpegArguments)
-                    ffmpegArguments = ["-i",inFileName,"-codec","copy","-brand","isom/avc1","-movflags","+faststart",
+                    ffmpegArguments = ["-i",inFileName,"-codec","copy","-dn","-map_chapters","-1","-brand","isom/avc1","-movflags","+faststart",
                                        "-map","0","-map_metadata","-1","-map_chapters","-1",outFileName];
                 
                 await ffmpeg.writeFile(inFileName, new Uint8Array(arrayBuffer));
@@ -1342,9 +1327,9 @@ module.exports = class Fake4Nitro {
                 ffmpeg.deleteFile(outFileName);
                 
                 if(data.length == 0){
-                    throw new Error(`An error occurred during muxing/encoding: Output file ended up empty or doesn't exist,
-                                    likely due to an FFmpeg error. Please check the FFmpeg logs above. If you need assistance,
-                                    please use the support channel in the Discord server.`);
+                    throw new Error("An error occurred during muxing/encoding: Output file ended up empty or doesn't exist, " + 
+                                    "likely due to an FFmpeg error. Please check the FFmpeg logs above. " +
+                                    "If you need assistance, please use the support channel in the Discord server.");
                 }
 
                 return data.buffer;
@@ -1354,7 +1339,7 @@ module.exports = class Fake4Nitro {
         async function ffmpegAudioTransmux(arrayBuffer, inFileName = "input.mp3", outFileName = "output.mp4"){
 
             let ffmpegArgs = ["-f","lavfi","-i","color=c=black:s=400x50","-i",inFileName,"-shortest","-fflags","+shortest", 
-                "-brand","isom/avc1","-movflags","+faststart","-map_metadata","-1","-map_chapters","-1",
+                "-brand","isom/avc1","-movflags","+faststart","-map_metadata","-1","-dn","-map_chapters","-1",
                 "-preset","ultrafast","-c:a","copy","-strict","-2","-tune", "stillimage","-r","1", outFileName];
 
             return await ffmpegTransmux(arrayBuffer, inFileName, ffmpegArgs, outFileName);
@@ -1387,8 +1372,10 @@ module.exports = class Fake4Nitro {
 
                if(currentFile.file.name.endsWith(".dlfc")) return;
 
+               console.log(currentFile);
+
                 const clipData = {
-                    "id": "",
+                    "id": 0,
                     "version": 3,
                     "applicationName": "",
                     "applicationId": "1301689862256066560",
@@ -1401,6 +1388,18 @@ module.exports = class Fake4Nitro {
                     "filepath": "",
                     "name": currentFile.file.name.substring(0, currentFile.file.name.lastIndexOf('.'))
                 };
+
+                switch(settings.clipTimestamp){
+                    default:
+                    case 0: //Zero
+                        break;
+                    case 1: //Current Time
+                        clipData.id = (BigInt(Date.now()) - 1420070400000n) << 22n;
+                        break;
+                    case 2: //Last Modified Date
+                        clipData.id = (BigInt(currentFile.file.lastModified) - 1420070400000n) << 22n;
+                        break;
+                }
 
                 // #region MP4 Clip
                 //larger than 10mb or force video clip enabled AND video clip bypass enabled AND is a video file AND is not a video type to skip
@@ -1700,7 +1699,22 @@ module.exports = class Fake4Nitro {
             ffmpegScript.remove();
         }
 
-        async function fetchAndRetryWithNetFetch(filename){
+        function tryFetchFromDisk(filename, encoding){
+            const basepath = path.join(BdApi.Plugins.folder, "ffmpeg");
+            let filepath = path.join(basepath, filename);
+            try{
+                if(fs.existsSync(filepath)){
+                    let file = fs.readFileSync(filepath, encoding);
+                    Logger.info("FakeNitro", `Fetch from disk for file ${filename} succeeded.`);
+                    return file;
+                }
+            }catch(err){
+                Logger.warn("FakeNitro", "Tried to read " + filename + "from disk but an error occurred.");
+                Logger.warn("FakeNitro", err);
+            }
+        }
+
+        async function fetchAndRetryWithNetFetch(filename){            
             const ffmpeg_js_baseurl = "https://raw.githubusercontent.com/riolubruh/YABDP4Nitro/refs/heads/main/ffmpeg/";
             let res = await fetch(ffmpeg_js_baseurl + filename, { timeout: 100000, cache: "force-cache" });
             if(res.ok || res.status == 200) {
@@ -1717,14 +1731,34 @@ module.exports = class Fake4Nitro {
             }
         }
 
+        async function fetchBlobUrl(filename){
+            try{
+                let blobUrl;
+                let file = tryFetchFromDisk(filename, "");
+                if(file) blobUrl = URL.createObjectURL(new Blob([file]));
+                else blobUrl = URL.createObjectURL(await (await fetchAndRetryWithNetFetch(filename)).blob());
+                return blobUrl;
+            }catch(err){
+                Logger.error(this.meta.name, "An error occurred while fetching " + filename);
+                throw err;
+            }
+        }
+
         try {
 
             //load 814.ffmpeg.js (ffmpeg worker)
-            let ffmpegWorkerURL = URL.createObjectURL(await (await fetchAndRetryWithNetFetch("814.ffmpeg.js")).blob());
-            
+            let ffmpegWorkerURL = await fetchBlobUrl("814.ffmpeg.js");
 
             //load FFmpeg.js as text
-            let ffmpegSrc = await (await fetchAndRetryWithNetFetch("ffmpeg.js")).text();
+            let ffmpegSrc;
+            try{
+                let file = tryFetchFromDisk("ffmpeg.js");
+                if(file) ffmpegSrc = file;
+                else ffmpegSrc = await (await fetchAndRetryWithNetFetch("ffmpeg.js")).text();
+            }catch(err){
+                Logger.error(this.meta.name, "An error occurred while fetching ffmpeg.js");
+                throw err;
+            }
 
             //patch worker URL in the source of ffmpeg.js (why is this a problem lmao)
             ffmpegSrc = ffmpegSrc.replace(`new URL(e.p+e.u(814),e.b)`, `"${ffmpegWorkerURL.toString()}"`);
@@ -1748,9 +1782,9 @@ module.exports = class Fake4Nitro {
             window.global.define = defineTemp;
 
             //load ffmpeg core
-            let ffmpegCoreURL = URL.createObjectURL(await (await fetchAndRetryWithNetFetch("ffmpeg-core.js")).blob());
+            let ffmpegCoreURL = await fetchBlobUrl("ffmpeg-core.js");
 
-            let ffmpegCoreWasmURL = URL.createObjectURL(await (await fetchAndRetryWithNetFetch("ffmpeg-core.wasm")).blob());
+            let ffmpegCoreWasmURL = await fetchBlobUrl("ffmpeg-core.wasm");
 
             if(FFmpegWASM && ffmpegCoreURL && ffmpegCoreWasmURL && ffmpegWorkerURL) {
                 ffmpeg = new FFmpegWASM.FFmpeg();
@@ -1772,7 +1806,7 @@ module.exports = class Fake4Nitro {
             }
         } catch(err) {
             UI.showToast("An error occured trying to load FFmpeg.wasm. Check console for details.", { type: "error", forceShow: true });
-            Logger.info(this.meta.name, "FFmpeg failed to load. The clips bypass will not work without this unless the file is already the correct format! Include above and below error messages when reporting!");
+            Logger.info(this.meta.name, "FFmpeg failed to load. The clips bypass will not work without this unless the file is already the correct format! Include above and below error messages (if they exist) when reporting!");
             Logger.error(this.meta.name, err);
         } finally {
             //Ensure we return window.global.define to its regular state just in case we errored during the short window where it has to be set to undefined.
@@ -2060,7 +2094,7 @@ module.exports = class Fake4Nitro {
                             }
                             if(stringToEncode == ""){
                                 UI.showToast("An error occurred: couldn't find file name.", { type: "error", forceShow: true });
-                                Logger.error("Fake4Nitro", "Couldn't find file name for some reason when grabbing Imgur URL for Custom PFP. Contact Riolubruh!");
+                                Logger.error("FakeNitro", "Couldn't find file name for some reason when grabbing Imgur URL for Custom PFP. Contact Riolubruh!");
                             }
 
                             //add starting "P{" , remove "imgur.com/" , and add ending "}"
@@ -2259,16 +2293,16 @@ module.exports = class Fake4Nitro {
                     let copyDecoration3y3 = function(){
                         try{
                             DiscordNative.clipboard.copy(" " + encodedStr);
-                            UI.showToast("3y3 copied to clipboard!", { type: "info" });    
+                            UI.showToast("3y3 copié avec succés!", { type: "info" });    
                         }catch(err){
-                            UI.showToast("Failed to copy to clipboard!", { type: "error", forceShow: true });   
+                            UI.showToast("Une erreur est survenue...", { type: "error", forceShow: true });   
                             Logger.error("FakeNitro", err);
                         }
                     };
 
                     profileEffectChildren.push(
                         React.createElement("img", {
-                            className: "riolubruhsSecretStuff",
+                            className: "fakenitroSecretStuff",
                             onClick: copyDecoration3y3,
                             src: previewURL,
                             title,
@@ -2328,7 +2362,7 @@ module.exports = class Fake4Nitro {
             ret.props.children.props.children.push(
                 //self explanatory create react element
                 React.createElement("button", {
-                    children: "Changer l'effet de profil [FakeNitro]",
+                    children: "Changer l'effet de profil[FakeNitro]",
                     className: `${buttonClassModule.button} ${buttonClassModule.lookFilled} ${buttonClassModule.colorBrand} ${buttonClassModule.sizeSmall} ${buttonClassModule.grow}`,
                     size: "bd-button-small",
                     id: "changeProfileEffectButton",
@@ -2339,7 +2373,7 @@ module.exports = class Fake4Nitro {
                         marginLeft: "10px"
                     },
                     onClick: () => {
-                        UI.showConfirmationModal("Changer l'effet de profil (FakeNitro)", React.createElement(EffectsModal), {cancelText:""});
+                        UI.showConfirmationModal("Changer l'effet de profil(FakeNitro)", React.createElement(EffectsModal), {cancelText:""});
                     }
 
                 })
@@ -2457,7 +2491,7 @@ module.exports = class Fake4Nitro {
             ret.props.children[0].props.children.push(
                 React.createElement("button", {
                     id: "decorationButton",
-                    children: "Changer la décoration [FakeNitro]",
+                    children: "Changer la décoration d'avaar[FakeNitro]",
                     style: {
                         width: "100px",
                         height: "50px",
@@ -2467,7 +2501,7 @@ module.exports = class Fake4Nitro {
                     },
                     className: `${buttonClassModule.button} ${buttonClassModule.lookFilled} ${buttonClassModule.colorBrand} ${buttonClassModule.sizeSmall} ${buttonClassModule.grow}`,
                     onClick: () => {
-                        UI.showConfirmationModal("Changer la décoration d'avatar (FakeNitro)", React.createElement(DecorModal), {cancelText:""});
+                        UI.showConfirmationModal("Changer la décoration d'avatar(FakeNitro)", React.createElement(DecorModal), {cancelText:""});
                     }
                 })
             );
@@ -2509,7 +2543,7 @@ module.exports = class Fake4Nitro {
                                 DiscordNative.clipboard.copy(" " + encodedStr);
                                 UI.showToast("3y3 copié avec succés!", { type: "info" });    
                             }catch(err){
-                                UI.showToast("Une erreur est survenue lors de la copie du 3y3", { type: "error", forceShow: true });   
+                                UI.showToast("Une erreur est survenue...", { type: "error", forceShow: true });   
                                 Logger.error("FakeNitro", err);
                             }
                         },
@@ -2555,13 +2589,15 @@ module.exports = class Fake4Nitro {
     // #endregion
 
     //#region Emote Uploader
-    async UploadEmote(url, channelIdLmao, msg, emoji, runs){
+    async UploadEmote(url, channelIdLmao, msg, emoji, runs, send){
+
+        if(!msg[2].attachmentsToUpload) msg[2].attachmentsToUpload = [];
         if(emoji === undefined){
-            let emoji;
+            let emoji = {animated: true, name: "default"};
         }
 
         if(msg === undefined){
-            let msg;
+            let msg = [channelIdLmao, {content: ""}, []];
         }
 
         let extension = ".gif";
@@ -2581,25 +2617,23 @@ module.exports = class Fake4Nitro {
         let fileUp = new CloudUploader({ file: file, isClip: false, isThumbnail: false, platform: 1 }, channelIdLmao, false, 0);
         fileUp.isImage = true;
 
-        //Options for the upload
-        let uploadOptions = new Object();
-        uploadOptions.channelId = channelIdLmao; //Upload to current channel
-        uploadOptions.uploads = [fileUp]; //The file from before
-        uploadOptions.draftType = 0; // Not sure what this does.
-        uploadOptions.options = {
-            stickerIds: [] //No stickers in the message
-        };
-        //Message attached to the upload.
-        uploadOptions.parsedMessage = { channelId: channelIdLmao, content: msg[1].content, tts: false, invalidEmojis: [] };
-
         //if this is not the first emoji uploaded
-        if(runs > 1){
+        if(runs >= 1){
             //make the message attached to the upload have no text
-            uploadOptions.parsedMessage = { channelId: channelIdLmao, content: "", tts: false, invalidEmojis: [] };
+            msg[1].content = "";
+            //clear nonce so this is sent as a new message
+            msg[2].nonce = "";
+            //clear list of attachments
+            msg[2].attachmentsToUpload = [];
         }
 
         try {
-            await Uploader.uploadFiles(uploadOptions); //finally finish the process of uploading
+            //add attachment
+            msg[2].attachmentsToUpload.unshift(fileUp);
+
+            //send and wait till its sent before moving on
+            await send.apply(undefined, msg);
+           
         } catch(err){
             Logger.error(this.meta.name, err);
         }
@@ -2607,7 +2641,7 @@ module.exports = class Fake4Nitro {
     // #endregion
 
     //#region Soundmoji Uploader
-    async UploadSoundmojis(ids, channelId, msg, sounds){
+    async UploadSoundmojis(ids, channelId, msg, sounds, send){
 
         if(ids != undefined && channelId != undefined && msg != undefined){
             let files = [];
@@ -2621,17 +2655,10 @@ module.exports = class Fake4Nitro {
                 files.push(fileUp);
                 fileUp.isAudio = true;
             }
-            let uploadOptions = new Object();
-            uploadOptions.channelId = channelId;
-            uploadOptions.draftType = 0;
-            uploadOptions.options = {
-                stickerIds: []
-            };
             if(files.length <= 10){
-                uploadOptions.uploads = files;
-                uploadOptions.parsedMessage = { channelId, content: msg.content, tts: false, invalidEmojis: [], validNonShortcutEmojis: [] };
+                
                 try {
-                    await Uploader.uploadFiles(uploadOptions); //finally finish the process of uploading
+                    send(channelId, msg, {attachmentsToUpload: files}) //finally finish the process of uploading
                 } catch(err){
                     Logger.error(this.meta.name, err);
                 }
@@ -2640,13 +2667,10 @@ module.exports = class Fake4Nitro {
                 let firstTime = true;
                 while (files.length){
                     let tenFiles = files.splice(0, 10);
-                    uploadOptions.uploads = tenFiles;
-                    if(firstTime)
-                        uploadOptions.parsedMessage = { channelId, content: msg.content, tts: false, invalidEmojis: [], validNonShortcutEmojis: [] };
-                    else
-                        uploadOptions.parsedMessage = { channelId, content: "", tts: false, invalidEmojis: [], validNonShortcutEmojis: [] };
+                    // uploadOptions.uploads = tenFiles;
+                    if(!firstTime) msg.content = ""
                     try {
-                        await Uploader.uploadFiles(uploadOptions); //finally finish the process of uploading
+                        send(channelId, msg, {attachmentsToUpload: tenFiles});
                     } catch(err){
                         Logger.error(this.meta.name, err);
                     }
@@ -2666,7 +2690,7 @@ module.exports = class Fake4Nitro {
         //If you're trying to figure this shit out yourself, I recommend uncommenting the line below.
         //console.log(StreamButtons);
 
-        const settings = Data.load("FakeNitro", "settings"); //just in case we can't access this;
+        const settings = Data.load("FakeNitro", "paramètres"); //just in case we can't access this;
 
         //If custom resolution tick is disabled or custom resolution is set to 0, set it to 1440
         let resolutionToSet = parseInt(settings.CustomResolution);
@@ -2714,7 +2738,7 @@ module.exports = class Fake4Nitro {
         ApplicationStreamFPSButtons[2].label = fpsToSet.toString();
         ApplicationStreamFPS.FPS_60 = fpsToSet;
 
-        Data.save("FakeNitro", "settings", settings);
+        Data.save("FakeNitro", "paramètres", settings);
     } //End of customizeStreamButtons()
     //#endregion
 
@@ -2765,7 +2789,7 @@ module.exports = class Fake4Nitro {
                 }    
 
                 if(!SDCEnabled){
-                    msg[1].validNonShortcutEmojis.forEach(async emoji => {
+                    msg[1].validNonShortcutEmojis?.forEach?.(async emoji => {
                         if(this.emojiBypassForValidEmoji(emoji, currentChannelId)) return; //Unlocked emoji. Skip.
                         if(emoji.type == "UNICODE") return; //If this "emoji" is actually a unicode character, it doesn't count. Skip bypassing if so.
                         if(emoji.guildId === undefined || emoji.id === undefined || emoji.useSpriteSheet) return; //Skip system emoji.
@@ -2830,7 +2854,7 @@ module.exports = class Fake4Nitro {
                 if(emojis.length > 0){
                     //upload all emotes
                     for(let i = 0; i < emojis.length; i++){
-                        await this.UploadEmote(emojiUrls[i], currentChannelId, msg, emojis[i], i)
+                        await this.UploadEmote(emojiUrls[i], currentChannelId, msg, emojis[i], i, send)
                     }
                     //reset message content since we dont want a repeated message if soundmoji upload happens next
                     msg[1].content = "";
@@ -2839,7 +2863,35 @@ module.exports = class Fake4Nitro {
             
             if(settings.soundmojiEnabled){
                 if(sounds.length > 0)
-                    await this.UploadSoundmojis(ids, channelId, msg[1], sounds);
+                    await this.UploadSoundmojis(ids, channelId, msg[1], sounds, send);
+            }
+
+            if(settings.stickerBypass){
+                let stickerIds = msg[2]?.stickerIds;
+                let currentChannelId = SelectedChannelStore.getChannelId();
+                if(stickerIds){
+                    for(let i = 0; i < stickerIds.length; i++){
+                        let stickerId = stickerIds[i];
+                        let stickerURL = "https://media.discordapp.net/stickers/" + stickerId + ".png?size=4096&quality=lossless";
+                        let msgtemp = [...msg];
+                        msgtemp[2].stickerIds = [];
+                        if(i > 0) msgtemp[1].content = "";
+        
+                        if(settings.uploadStickers){
+                            let emoji = new Object();
+                            emoji.animated = false;
+                            emoji.name = "sticker";
+                            this.UploadEmote(stickerURL, currentChannelId, msgtemp, emoji, 0, send);
+                            return;
+                        } else{
+                            let messageContent = { content: stickerURL, tts: false, invalidEmojis: [], validNonShortcutEmojis: [] };
+                            MessageActions.sendMessage(currentChannelId, messageContent, undefined, {});
+                            return;
+                        }
+                    }
+                }
+    
+                
             }
 
             if(emojis.length == 0 && sounds.length == 0){
@@ -2866,81 +2918,6 @@ module.exports = class Fake4Nitro {
         Patcher.instead(this.meta.name, isEmojiAvailableMod, "getEmojiUnavailableReason", () => {
             return;
         });
-
-        if(settings.emojiBypassType == 0){
-
-            //#region uploadFiles Upload
-            Patcher.instead(this.meta.name, Uploader, "uploadFiles", (_, [args], originalFunction) => {
-
-                if(document.getElementsByClassName("sdc-tooltip").length > 0){
-                    let SDC_Tooltip = document.getElementsByClassName("sdc-tooltip")[0];
-                    if(SDC_Tooltip.innerHTML == "Disable Encryption"){
-                        //SDC Encryption Enabled
-                        originalFunction(args);
-                        return;
-                    }
-                }
-                const currentChannelId = args.channelId;
-                let emojis = [];
-                let runs = 0;
-
-                if(args.parsedMessage.validNonShortcutEmojis != undefined){
-                    if(args.parsedMessage.validNonShortcutEmojis.length > 0){
-                        args.parsedMessage.validNonShortcutEmojis.forEach(emoji => {
-                            if(this.emojiBypassForValidEmoji(emoji, currentChannelId)) return; //Unlocked emoji. Skip.
-                            if(emoji.type == "UNICODE") return; //If this "emoji" is actually a unicode character, it doesn't count. Skip bypassing if so.
-                            if(settings.PNGemote){
-                                emoji.forcePNG = true; //replace WEBP with PNG if the option is enabled.
-                            }
-
-                            let emojiUrl = AvatarDefaults.getEmojiURL(emoji);
-                            if(emoji.guildId === undefined || emoji.id === undefined || emoji.useSpriteSheet) return; //Skip system emoji.
-                            if(emoji.animated){
-                                emojiUrl = emojiUrl.substr(0, emojiUrl.lastIndexOf(".")) + ".gif";
-                            }
-
-                            //If there is a backslash (\) before the emote we are processing,
-                            if(args.parsedMessage.content.includes("\\<" + emoji.allNamesString.replace(/~\b\d+\b/g, "") + emoji.id + ">")){
-                                //remove the backslash
-                                args.parsedMessage.content = args.parsedMessage.content.replace(("\\<" + emoji.allNamesString.replace(/~\b\d+\b/g, "") + emoji.id + ">"), ("<" + emoji.allNamesString.replace(/~\b\d+\b/g, "") + emoji.id + ">"));
-                                //and skip bypass for that emote
-                                return;
-                            }
-
-                            //add to list of emojis
-                            emojis.push(emoji);
-
-                            //remove emote from message.
-                            args.parsedMessage.content = args.parsedMessage.content.replace(`<${emoji.animated ? "a" : ""}${emoji.allNamesString.replace(/~\b\d+\b/g, "")}${emoji.id}>`, "");
-                        });
-
-                        //send file with text and shit
-                        originalFunction(args);
-
-                        //loop through emotes to send one at a time. this has technically no delay so it may trigger anti-spam.
-                        for(let i = 0; i < emojis.length; i++){
-                            let emoji = emojis[i];
-                            let emojiUrl = AvatarDefaults.getEmojiURL(emoji);
-                            if(emoji.animated){
-                                emojiUrl = emojiUrl.substr(0, emojiUrl.lastIndexOf(".")) + ".gif";
-                            }
-
-                            //remove existing URL parameters and add custom URL parameters for user's size preference. quality is always lossless.
-                            emojiUrl = emojiUrl.split("?")[0] + `?size=${settings.emojiSize}&quality=lossless&`;
-
-                            this.UploadEmote(emojiUrl, currentChannelId, [currentChannelId, { content: "", tts: false, invalidEmojis: [] }], emoji, 1);
-                        }
-
-                    }else{
-                        originalFunction(args);
-                    }
-                }else{
-                    originalFunction(args);
-                }
-
-            });
-            //#endregion
-        }
 
         //#region Ghost Mode Patch
         //Ghost mode method
@@ -2998,13 +2975,6 @@ module.exports = class Fake4Nitro {
                 ghostModeMethod(msg, currentChannelId, this);
             });
 
-            //uploading file with emoji in the message in ghost mode.
-            Patcher.before(this.meta.name, Uploader, "uploadFiles", (_, [args], originalFunction) => {
-                const currentChannelId = args.channelId;
-                const msg = args.parsedMessage;
-                ghostModeMethod(msg, currentChannelId, this);
-            });
-
         }
         //#endregion
 
@@ -3044,13 +3014,6 @@ module.exports = class Fake4Nitro {
 
             //sending message in classic mode
             Patcher.before(this.meta.name, MessageActions, "sendMessage", (_, [currentChannelId, msg]) => {
-                classicModeMethod(msg, currentChannelId, this);
-            });
-
-            //uploading file with emoji in the message in classic mode.
-            Patcher.before(this.meta.name, Uploader, "uploadFiles", (_, [args], originalFunction) => {
-                const msg = args.parsedMessage;
-                const currentChannelId = args.channelId;
                 classicModeMethod(msg, currentChannelId, this);
             });
 
@@ -3104,13 +3067,6 @@ module.exports = class Fake4Nitro {
             Patcher.before(this.meta.name, MessageActions, "sendMessage", (_, [currentChannelId, msg]) => {
                 vencordModeMethod(msg, currentChannelId, this);
             });
-
-            //uploading file with emoji in the message in vencord-like mode.
-            Patcher.before(this.meta.name, Uploader, "uploadFiles", (_, [args], originalFunction) => {
-                const msg = args.parsedMessage;
-                const currentChannelId = args.channelId;
-                vencordModeMethod(msg, currentChannelId, this);
-            });
         }
         //#endregion
     } //End of emojiBypass()
@@ -3122,7 +3078,7 @@ module.exports = class Fake4Nitro {
             for(let i = 0; i < args.content.length; i++){
                 let contentItem = args.content[i];
 
-                if(contentItem.type.type?.toString().includes("MASKED_LINK")){ //is it a hyperlink?
+                if(contentItem?.type?.type?.toString?.().includes?.("MASKED_LINK")){ //is it a hyperlink?
 
                     if(contentItem.props.href.startsWith("https://cdn.discordapp.com/emojis/")){ //does this hyperlink have an emoji URL?
 
@@ -3305,7 +3261,7 @@ module.exports = class Fake4Nitro {
                 emoji.animated = false;
                 emoji.name = args[0];
                 let msg = [undefined, { content: "" }];
-                this.UploadEmote(stickerURL, currentChannelId, [undefined, { content: "" }], emoji);
+                this.UploadEmote(stickerURL, currentChannelId, msg, emoji, 1, send);
                 return;
             }
             if(!settings.uploadStickers){
@@ -3349,11 +3305,10 @@ module.exports = class Fake4Nitro {
         });
 
         Patcher.after(this.meta.name, this.colorPickerRendererMod, "ProfileThemesSection", (_, args, ret) => {
-
             ret.props.children.props.children.push( //append copy colors 3y3 button
                 React.createElement("button", {
                     id: "copy3y3button",
-                    children: "Copier le 3y3 du thème de profil",
+                    children: "Copy Colors 3y3",
                     className: `${buttonClassModule.button} ${buttonClassModule.lookFilled} ${buttonClassModule.colorBrand} ${buttonClassModule.sizeSmall} ${buttonClassModule.grow}`,
                     style: {
                         marginLeft: "10px",
@@ -3362,7 +3317,7 @@ module.exports = class Fake4Nitro {
                     onClick: () => {
                         let themeColors;
                         themeColors = UserSettingsAccountStore.getAllPending().pendingThemeColors;
-                        if(!themeColors && (CurrentUser.premiumType == null || CurrentUser.premiumType == undefined) && !settings.removeProfileUpsell)
+                        if(!themeColors)
                             themeColors = UserSettingsAccountStore.getAllTryItOut().tryItOutThemeColors;
                         if(!themeColors){
                             UI.showToast("Nothing has been copied. Is the selected color identical to your current color?", { type: "warning" });
@@ -3425,6 +3380,7 @@ module.exports = class Fake4Nitro {
 
         //Patch getBannerURL function
         Patcher.instead(this.meta.name, getBannerURL, "getBannerURL", (user, [args], ogFunction) => {
+
             let profile = user._userProfile;
 
             //Returning ogFunction with the same arguments that were passed to this function will do the vanilla check for a legit banner.
@@ -3481,7 +3437,7 @@ module.exports = class Fake4Nitro {
 
                 //return final banner URL.
                 return `https://i.imgur.com/${matchedText}`;
-            }
+            }else return ogFunction(args);
         }); //End of patch for getBannerURL
     } //End of bannerUrlDecoding()
     //#endregion
@@ -3505,7 +3461,7 @@ module.exports = class Fake4Nitro {
             //create and append profileBannerUrlInput input element.
             let profileBannerUrlInput = React.createElement("input", {
                 id: "profileBannerUrlInput",
-                placeholder: "ᴹᵉᵗ ᶦᶜᶦ ˡ'ᵁᴿᴸ ᴵᵐᵍᵘʳ ᵈᵉ ᵗᵃ ᵇᵃⁿⁿᶦᵉ̀ʳᵉ",
+                placeholder: "Imgur URL for Banner",
                 style: {
                     float: "right",
                     width: "30%",
@@ -3523,7 +3479,7 @@ module.exports = class Fake4Nitro {
 
                 React.createElement("button", {
                     id: "profileBannerButton",
-                    children: "Copier le 3y3 de la bannière",
+                    children: "Copy Banner 3y3",
                     className: `${buttonClassModule.button} ${buttonClassModule.lookFilled} ${buttonClassModule.colorBrand} ${buttonClassModule.sizeSmall} ${buttonClassModule.grow}`,
                     size: "bd-button-small",
                     style: {
@@ -3590,7 +3546,7 @@ module.exports = class Fake4Nitro {
                             }
                             if(stringToEncode == ""){
                                 UI.showToast("An error occurred: couldn't find file name.", { type: "error", forceShow: true });
-                                Logger.error("FakeNitro", "Couldn't find file name when trying to grab Imgur URL for Profile Banner for some reason. Contact Riolubruh.");
+                                Logger.error("FakeNitro", "Couldn't find file name when trying to grab Imgur URL for Profile Banner for some reason.");
                                 return;
                             }
                             //add starting "B{" , remove "imgur.com/" , and add ending "}"
@@ -3687,7 +3643,7 @@ module.exports = class Fake4Nitro {
                 res = await Net.fetch(this.meta.updateUrl);
                 if(!res.ok && res.status != 200){
                     Logger.error("FakeNitro", res);
-                    throw new Error("Failed to check for updates!");
+                    throw new Error("Impossible de vérifier une mise à jour");
                 }
             }
 
@@ -3705,17 +3661,17 @@ module.exports = class Fake4Nitro {
             }
         }
         catch(err){
-            UI.showToast("[FakeNitro] Failed to check for updates", { type: "error" });
+            UI.showToast("[FakeNitro] Impossible de vérifier une mise à jour", { type: "error" });
             Logger.error(this.meta.name, err);
         }
 
     }
 
     newUpdateNotify(remoteMeta, remoteFile){
-        Logger.info(this.meta.name, "A new update is available!");
+        Logger.info(this.meta.name, "Nouvelle mise à jour trouvée!");
 
-        UI.showConfirmationModal("Update Available", [`Update ${remoteMeta.version} is now available for FakeNitro!`, "Press Download Now to update!"], {
-            confirmText: "📥Download Now",
+        UI.showConfirmationModal("Nouvelle MàJ", [`Update ${remoteMeta.version} is now available for FakeNitro!`, "Press Download Now to update!"], {
+            confirmText: "📥Télécharger maintenant",
             onConfirm: async (e) => {
                 if(remoteFile){
                     await new Promise(r => fs.writeFile(path.join(Plugins.folder, `${this.meta.name}.plugin.js`), remoteFile, r));
@@ -3724,7 +3680,7 @@ module.exports = class Fake4Nitro {
                         currentVersionInfo.hasShownChangelog = false;
                         Data.save(this.meta.name, "currentVersionInfo", currentVersionInfo);
                     } catch(err){
-                        UI.showToast("An error occurred when trying to download the update!", { type: "error", forceShow: true });
+                        UI.showToast("Une erreur est survenue lors de l'installation de la mise à jour...", { type: "error", forceShow: true });
                     }
                 }
             }
