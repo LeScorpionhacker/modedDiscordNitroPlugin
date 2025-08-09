@@ -3392,7 +3392,7 @@ module.exports = class FakeNitro {
             ret.props.children.props.children.push( //append copy colors 3y3 button
                 React.createElement("button", {
                     id: "copy3y3button",
-                    children: "Copy Colors 3y3",
+                    children: "Copier le 3y3 de thème de profil",
                     className: `${buttonClassModule.button} ${buttonClassModule.lookFilled} ${buttonClassModule.colorBrand} ${buttonClassModule.sizeSmall} ${buttonClassModule.grow}`,
                     style: {
                         marginLeft: "10px",
